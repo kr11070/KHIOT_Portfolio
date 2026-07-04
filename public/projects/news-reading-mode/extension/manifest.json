@@ -21,7 +21,6 @@
     "service_worker": "background.js"
   },
   "host_permissions": [
-    "https://news-reading-mode.netlify.app/*",
-    "http://localhost:8888/*"
+    "https://agileserver.netlify.app/*"
   ]
 }

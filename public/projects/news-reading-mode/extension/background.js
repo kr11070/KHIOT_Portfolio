@@ -1,6 +1,5 @@
-// 배포된 백엔드 주소로 바꿔주세요. (server/ 폴더를 Netlify에 배포한 뒤의 사이트 주소)
-// 로컬에서 `netlify dev`로 테스트할 때는 http://localhost:8888 을 사용합니다.
-const API_BASE_URL = 'https://news-reading-mode.netlify.app';
+// server/ 폴더를 Netlify에 배포한 백엔드 사이트 주소입니다.
+const API_BASE_URL = 'https://agileserver.netlify.app';
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type !== 'NRM_SIMPLIFY') return false;

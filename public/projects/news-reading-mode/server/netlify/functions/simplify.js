@@ -1,5 +1,5 @@
 const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
-const MODEL = 'llama-3.1-8b-instant';
+const MODEL = 'llama-3.3-70b-versatile';
 
 const SYSTEM_PROMPT =
   '너는 뉴스 기사를 초등학생도 이해할 수 있는 쉬운 말로 다시 써주는 도우미야. ' +
