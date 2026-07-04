@@ -36,7 +36,7 @@
   const LEVELS = ['original', 'simple', 'easy'];
   const LEVEL_TOPS = [15, 50, 85]; // 트랙 안에서 각 단계의 점/노브 위치(%)
   let appliedLevel = 0; // 현재 본문에 적용된 단계
-  let loading = false;
+  let busy = false; // 변환 요청 또는 페이드 전환이 진행 중인 동안 true
   const memoryCache = {}; // { simple: html, easy: html } — 이 페이지를 보는 동안만 유지
 
   // ── 세로 슬라이더 UI (프로토타입의 rlv 구조 이식) ──
@@ -116,53 +116,64 @@
     });
   }
 
+  const FADE_MS = 220;
+
+  // 본문을 페이드아웃 → 내용 교체 → 페이드인으로 부드럽게 전환
+  function swapContent(html) {
+    return new Promise((resolve) => {
+      container.classList.add('nrm-fade');
+      container.classList.add('nrm-fade-out');
+      setTimeout(() => {
+        container.innerHTML = html;
+        void container.offsetWidth; // 강제 리플로우로 트랜지션 재시작 보장
+        container.classList.remove('nrm-fade-out');
+        setTimeout(resolve, FADE_MS);
+      }, FADE_MS);
+    });
+  }
+
   async function selectLevel(nextIndex) {
-    if (loading) return;
+    if (busy) return;
     if (nextIndex === appliedLevel) {
       setKnob(nextIndex); // 드래그 후 제자리로 스냅만
       return;
     }
     const level = LEVELS[nextIndex];
     const prevIndex = appliedLevel;
-
-    if (level === 'original') {
-      container.innerHTML = originalHtml;
-      appliedLevel = nextIndex;
-      setKnob(nextIndex);
-      return;
-    }
-
-    if (memoryCache[level]) {
-      container.innerHTML = memoryCache[level];
-      appliedLevel = nextIndex;
-      setKnob(nextIndex);
-      return;
-    }
-
-    loading = true;
-    knob.classList.add('loading');
+    busy = true;
     setKnob(nextIndex); // 노브는 먼저 이동시키고, 실패하면 되돌린다
 
     try {
-      let html = await loadFromStorage(level);
-      if (!html) {
-        const simplifiedText = await requestSimplifiedText(originalText, level);
-        html = textToHtml(simplifiedText);
-        saveToStorage(level, html);
+      let html;
+      if (level === 'original') {
+        html = originalHtml;
+      } else if (memoryCache[level]) {
+        html = memoryCache[level];
+      } else {
+        knob.classList.add('loading');
+        html = await loadFromStorage(level);
+        if (!html) {
+          const simplifiedText = await requestSimplifiedText(originalText, level);
+          html = textToHtml(simplifiedText);
+          saveToStorage(level, html);
+        }
+        memoryCache[level] = html;
+        knob.classList.remove('loading');
       }
-      memoryCache[level] = html;
-      container.innerHTML = html;
+      await swapContent(html);
       appliedLevel = nextIndex;
     } catch (err) {
+      knob.classList.remove('loading');
       setKnob(prevIndex);
       showToast('변환에 실패했어요: ' + err.message);
     } finally {
-      loading = false;
-      knob.classList.remove('loading');
+      busy = false;
     }
   }
 
   // ── 트랙 드래그: 노브가 포인터를 연속적으로 따라오고, 놓으면 가장 가까운 단계로 스냅 ──
+  // 이동/놓기 이벤트는 window에서 받는다. 트랙 요소에만 걸면 포인터가 트랙을 벗어났을 때
+  // pointerup을 놓쳐 드래그 상태가 꼬일 수 있다 (두 번째 드래그가 안 잡히던 원인).
   const MIN_TOP = LEVEL_TOPS[0];
   const MAX_TOP = LEVEL_TOPS[LEVEL_TOPS.length - 1];
   let dragging = false;
@@ -197,14 +208,14 @@
   }
 
   track.addEventListener('pointerdown', (e) => {
-    if (loading) return;
+    if (busy) return;
+    e.preventDefault();
     dragging = true;
     knob.classList.add('dragging'); // top 트랜지션 끄기 → 포인터에 1:1로 붙어서 움직임
-    try { track.setPointerCapture(e.pointerId); } catch (_) {}
     moveKnobFree(topPercentFromEvent(e));
   });
 
-  track.addEventListener('pointermove', (e) => {
+  window.addEventListener('pointermove', (e) => {
     if (!dragging) return;
     moveKnobFree(topPercentFromEvent(e));
   });
@@ -213,12 +224,11 @@
     if (!dragging) return;
     dragging = false;
     knob.classList.remove('dragging'); // 트랜지션 다시 켜기 → 스냅이 부드럽게
-    try { track.releasePointerCapture(e.pointerId); } catch (_) {}
     selectLevel(nearestLevel(topPercentFromEvent(e)));
   }
 
-  track.addEventListener('pointerup', endDrag);
-  track.addEventListener('pointercancel', endDrag);
+  window.addEventListener('pointerup', endDrag);
+  window.addEventListener('pointercancel', endDrag);
 
   labels.forEach((l) => l.addEventListener('click', () => selectLevel(Number(l.dataset.level))));
 })();

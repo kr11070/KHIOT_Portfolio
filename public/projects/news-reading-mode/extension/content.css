@@ -110,6 +110,15 @@
   50% { opacity: 0.25; }
 }
 
+/* 단계 전환 시 본문 크로스페이드 (페이드아웃 → 교체 → 페이드인) */
+.nrm-fade {
+  transition: opacity 0.22s ease;
+}
+
+.nrm-fade-out {
+  opacity: 0 !important;
+}
+
 #nrm-toast {
   position: fixed;
   bottom: 92px;
