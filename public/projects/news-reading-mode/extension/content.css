@@ -93,6 +93,13 @@
   background: #143c7e;
 }
 
+/* 드래그 중: 트랜지션을 꺼서 노브가 포인터에 1:1로 붙어 움직이게 */
+.nrm-rlv-knob.dragging {
+  transition: none;
+  cursor: grabbing;
+  box-shadow: 0 6px 20px rgba(20, 60, 126, 0.25);
+}
+
 /* 변환 요청 중일 때 노브 안쪽 점이 깜빡이며 로딩 상태 표시 */
 .nrm-rlv-knob.loading .nrm-rlv-knob-dot {
   animation: nrm-pulse 1s ease-in-out infinite;
@@ -101,28 +108,6 @@
 @keyframes nrm-pulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.25; }
-}
-
-/* 단계 전환 시 이전 위치에 남는 잔상 */
-.nrm-rlv-knob-ghost {
-  position: absolute;
-  left: 50%;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: radial-gradient(circle, #6366f1, #3182f6);
-  transform: translate(-50%, -50%) scale(0.8);
-  opacity: 0.3;
-  pointer-events: none;
-  z-index: 1;
-  animation: nrm-ghost-fade 1s ease forwards;
-}
-
-@keyframes nrm-ghost-fade {
-  to {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(1.4);
-  }
 }
 
 #nrm-toast {

@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "뉴스 쉬운말 모드",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "네이버뉴스, 다음뉴스, 한국경제, 중앙일보, 동아일보, 한겨레, 연합뉴스, 조선일보 기사 페이지에 세로 슬라이더를 띄우고, AI가 본문을 원문/쉬운말/쉽게읽기 3단계로 바꿔줍니다.",
   "permissions": ["storage"],
   "content_scripts": [

@@ -66,15 +66,6 @@
     labels.forEach((l) => l.classList.toggle('active', Number(l.dataset.level) === levelIndex));
   }
 
-  // 단계 전환 시 이전 노브 자리에 잔상을 남기고 페이드아웃 (프로토타입의 ghost 효과)
-  function spawnGhost(levelIndex) {
-    const ghost = document.createElement('div');
-    ghost.className = 'nrm-rlv-knob-ghost';
-    ghost.style.top = LEVEL_TOPS[levelIndex] + '%';
-    track.appendChild(ghost);
-    setTimeout(() => ghost.remove(), 1000);
-  }
-
   function showToast(message) {
     const existing = document.getElementById('nrm-toast');
     if (existing) existing.remove();
@@ -126,13 +117,16 @@
   }
 
   async function selectLevel(nextIndex) {
-    if (loading || nextIndex === appliedLevel) return;
+    if (loading) return;
+    if (nextIndex === appliedLevel) {
+      setKnob(nextIndex); // 드래그 후 제자리로 스냅만
+      return;
+    }
     const level = LEVELS[nextIndex];
     const prevIndex = appliedLevel;
 
     if (level === 'original') {
       container.innerHTML = originalHtml;
-      spawnGhost(prevIndex);
       appliedLevel = nextIndex;
       setKnob(nextIndex);
       return;
@@ -140,7 +134,6 @@
 
     if (memoryCache[level]) {
       container.innerHTML = memoryCache[level];
-      spawnGhost(prevIndex);
       appliedLevel = nextIndex;
       setKnob(nextIndex);
       return;
@@ -159,7 +152,6 @@
       }
       memoryCache[level] = html;
       container.innerHTML = html;
-      spawnGhost(prevIndex);
       appliedLevel = nextIndex;
     } catch (err) {
       setKnob(prevIndex);
@@ -170,30 +162,63 @@
     }
   }
 
-  // 트랙 클릭/드래그 → Y좌표 비율로 단계 계산 (프로토타입 로직 이식)
+  // ── 트랙 드래그: 노브가 포인터를 연속적으로 따라오고, 놓으면 가장 가까운 단계로 스냅 ──
+  const MIN_TOP = LEVEL_TOPS[0];
+  const MAX_TOP = LEVEL_TOPS[LEVEL_TOPS.length - 1];
   let dragging = false;
 
-  function levelFromEvent(e) {
+  // 포인터 Y좌표 → 트랙 안에서의 노브 위치(%). 점 범위(15~85%) 밖으로는 못 나가게 클램프.
+  function topPercentFromEvent(e) {
     const rect = track.getBoundingClientRect();
     const ratio = Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height));
-    return ratio < 0.3 ? 0 : ratio > 0.7 ? 2 : 1;
+    return Math.max(MIN_TOP, Math.min(MAX_TOP, ratio * 100));
+  }
+
+  // 현재 노브 위치(%)에서 가장 가까운 단계 인덱스
+  function nearestLevel(topPercent) {
+    let best = 0;
+    let bestDist = Infinity;
+    LEVEL_TOPS.forEach((t, i) => {
+      const dist = Math.abs(topPercent - t);
+      if (dist < bestDist) {
+        bestDist = dist;
+        best = i;
+      }
+    });
+    return best;
+  }
+
+  function moveKnobFree(topPercent) {
+    knob.style.top = topPercent + '%';
+    // 드래그 중에는 가장 가까운 단계를 점/라벨 하이라이트로만 미리 보여준다 (변환은 아직 안 함)
+    const near = nearestLevel(topPercent);
+    dots.forEach((d, i) => d.classList.toggle('active', i === near));
+    labels.forEach((l) => l.classList.toggle('active', Number(l.dataset.level) === near));
   }
 
   track.addEventListener('pointerdown', (e) => {
+    if (loading) return;
     dragging = true;
+    knob.classList.add('dragging'); // top 트랜지션 끄기 → 포인터에 1:1로 붙어서 움직임
     try { track.setPointerCapture(e.pointerId); } catch (_) {}
-    selectLevel(levelFromEvent(e));
+    moveKnobFree(topPercentFromEvent(e));
   });
 
   track.addEventListener('pointermove', (e) => {
     if (!dragging) return;
-    selectLevel(levelFromEvent(e));
+    moveKnobFree(topPercentFromEvent(e));
   });
 
-  track.addEventListener('pointerup', (e) => {
+  function endDrag(e) {
+    if (!dragging) return;
     dragging = false;
+    knob.classList.remove('dragging'); // 트랜지션 다시 켜기 → 스냅이 부드럽게
     try { track.releasePointerCapture(e.pointerId); } catch (_) {}
-  });
+    selectLevel(nearestLevel(topPercentFromEvent(e)));
+  }
+
+  track.addEventListener('pointerup', endDrag);
+  track.addEventListener('pointercancel', endDrag);
 
   labels.forEach((l) => l.addEventListener('click', () => selectLevel(Number(l.dataset.level))));
 })();
