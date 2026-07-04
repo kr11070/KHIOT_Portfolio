@@ -9,7 +9,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       const res = await fetch(`${API_BASE_URL}/.netlify/functions/simplify`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: message.text }),
+        body: JSON.stringify({ text: message.text, level: message.level }),
       });
 
       if (!res.ok) {

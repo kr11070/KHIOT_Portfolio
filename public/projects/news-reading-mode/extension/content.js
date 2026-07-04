@@ -28,15 +28,21 @@
   const container = findArticleContainer();
   if (!container) return;
 
+  // 항상 "원문" 기준으로만 변환을 요청하기 위해, 처음 한 번만 원문 텍스트/HTML을 저장해둔다.
   const originalHtml = container.innerHTML;
-  let simplifiedHtml = null;
-  let isOn = false;
+  const originalText = container.innerText.trim().slice(0, 6000);
+
+  // 원문 → 쉬운말 → 쉽게읽기 → 원문 순으로 순환. 버튼 라벨은 "누르면 다음에 될 상태"를 보여준다.
+  const LEVELS = ['original', 'simple', 'easy'];
+  const NEXT_LABEL = { original: '쉬운말', simple: '쉽게읽기', easy: '원문' };
+  let levelIndex = 0;
+  const memoryCache = {}; // { simple: html, easy: html } - 이 페이지를 보는 동안만 유지
 
   const btn = document.createElement('button');
   btn.id = 'nrm-floating-btn';
   btn.type = 'button';
   btn.dataset.state = 'off';
-  btn.innerText = '쉬운말';
+  btn.innerText = NEXT_LABEL[LEVELS[levelIndex]];
   document.body.appendChild(btn);
 
   function showToast(message) {
@@ -49,9 +55,33 @@
     setTimeout(() => toast.remove(), 4000);
   }
 
-  async function requestSimplifiedText(rawText) {
+  function storageKey(level) {
+    return `nrm-cache:${location.href}:${level}`;
+  }
+
+  function loadFromStorage(level) {
+    return new Promise((resolve) => {
+      chrome.storage.local.get(storageKey(level), (result) => {
+        resolve(result[storageKey(level)] || null);
+      });
+    });
+  }
+
+  function saveToStorage(level, html) {
+    chrome.storage.local.set({ [storageKey(level)]: html });
+  }
+
+  function textToHtml(text) {
+    return text
+      .split('\n')
+      .filter((line) => line.trim().length > 0)
+      .map((line) => `<p>${line.trim()}</p>`)
+      .join('');
+  }
+
+  async function requestSimplifiedText(rawText, level) {
     return new Promise((resolve, reject) => {
-      chrome.runtime.sendMessage({ type: 'NRM_SIMPLIFY', text: rawText }, (response) => {
+      chrome.runtime.sendMessage({ type: 'NRM_SIMPLIFY', text: rawText, level }, (response) => {
         if (chrome.runtime.lastError) {
           reject(new Error(chrome.runtime.lastError.message));
           return;
@@ -65,22 +95,24 @@
     });
   }
 
-  btn.addEventListener('click', async () => {
-    if (btn.dataset.state === 'loading') return;
+  function setButtonToLevel(nextIndex, state) {
+    levelIndex = nextIndex;
+    btn.dataset.state = state;
+    btn.innerText = NEXT_LABEL[LEVELS[levelIndex]];
+  }
 
-    if (isOn) {
+  async function applyLevel(nextIndex) {
+    const level = LEVELS[nextIndex];
+
+    if (level === 'original') {
       container.innerHTML = originalHtml;
-      isOn = false;
-      btn.dataset.state = 'off';
-      btn.innerText = '쉬운말';
+      setButtonToLevel(nextIndex, 'off');
       return;
     }
 
-    if (simplifiedHtml) {
-      container.innerHTML = simplifiedHtml;
-      isOn = true;
-      btn.dataset.state = 'on';
-      btn.innerText = '원문';
+    if (memoryCache[level]) {
+      container.innerHTML = memoryCache[level];
+      setButtonToLevel(nextIndex, 'on');
       return;
     }
 
@@ -88,21 +120,24 @@
     btn.innerText = '변환중';
 
     try {
-      const rawText = container.innerText.trim().slice(0, 6000);
-      const simplifiedText = await requestSimplifiedText(rawText);
-      simplifiedHtml = simplifiedText
-        .split('\n')
-        .filter((line) => line.trim().length > 0)
-        .map((line) => `<p>${line.trim()}</p>`)
-        .join('');
-      container.innerHTML = simplifiedHtml;
-      isOn = true;
-      btn.dataset.state = 'on';
-      btn.innerText = '원문';
+      let html = await loadFromStorage(level);
+      if (!html) {
+        const simplifiedText = await requestSimplifiedText(originalText, level);
+        html = textToHtml(simplifiedText);
+        saveToStorage(level, html);
+      }
+      memoryCache[level] = html;
+      container.innerHTML = html;
+      setButtonToLevel(nextIndex, 'on');
     } catch (err) {
-      btn.dataset.state = 'off';
-      btn.innerText = '쉬운말';
+      setButtonToLevel(levelIndex, levelIndex === 0 ? 'off' : 'on');
       showToast('쉬운말 변환에 실패했어요: ' + err.message);
     }
+  }
+
+  btn.addEventListener('click', () => {
+    if (btn.dataset.state === 'loading') return;
+    const nextIndex = (levelIndex + 1) % LEVELS.length;
+    applyLevel(nextIndex);
   });
 })();

@@ -1,11 +1,25 @@
 const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
 const MODEL = 'llama-3.3-70b-versatile';
 
-const SYSTEM_PROMPT =
-  '너는 뉴스 기사를 초등학생도 이해할 수 있는 쉬운 말로 다시 써주는 도우미야. ' +
-  '문장은 짧게, 어려운 용어는 풀어서 설명하고, 원문의 핵심 사실과 수치는 그대로 유지해줘. ' +
+const COMMON_RULES =
   '결과는 문단마다 줄바꿈으로 구분해서 순수 텍스트로만 답해줘 (마크다운, HTML 태그 사용 금지). ' +
-  '반드시 한국어로만 답하고, 영어·힌디어 등 다른 언어나 문자는 절대 섞지 마.';
+  '반드시 한국어로만 답하고, 영어·힌디어 등 다른 언어나 문자는 절대 섞지 마. ' +
+  '원문의 핵심 사실과 수치는 빠뜨리지 말고 그대로 유지해줘.';
+
+const LEVEL_PROMPTS = {
+  // 쉬운말: 원문보다 쉽지만 정보는 상세히 유지
+  simple:
+    '너는 뉴스 기사를 쉬운 말로 다시 써주는 도우미야. ' +
+    '어려운 용어나 전문 용어는 풀어서 설명하고, "-습니다"체로 정중하게 써줘. ' +
+    '원문보다는 이해하기 쉽게 바꾸되, 세부 정보는 최대한 유지해줘. ' +
+    COMMON_RULES,
+  // 쉽게읽기: 훨씬 더 단순하고 짧은 문장, 친근한 말투
+  easy:
+    '너는 뉴스 기사를 초등학교 저학년도 이해할 수 있을 만큼 아주 쉬운 말로 다시 써주는 도우미야. ' +
+    '문장은 아주 짧게 끊어서, 친근하고 부드러운 말투로 써줘. ' +
+    '어려운 단어는 완전히 풀어서 설명하고, 세부 설명은 줄이더라도 핵심 사실은 꼭 남겨줘. ' +
+    COMMON_RULES,
+};
 
 exports.handler = async (event) => {
   const corsHeaders = {
@@ -32,8 +46,9 @@ exports.handler = async (event) => {
   }
 
   let text;
+  let level;
   try {
-    ({ text } = JSON.parse(event.body || '{}'));
+    ({ text, level } = JSON.parse(event.body || '{}'));
   } catch {
     return { statusCode: 400, headers: corsHeaders, body: JSON.stringify({ error: '잘못된 요청 본문입니다.' }) };
   }
@@ -41,6 +56,8 @@ exports.handler = async (event) => {
   if (!text || typeof text !== 'string') {
     return { statusCode: 400, headers: corsHeaders, body: JSON.stringify({ error: 'text 필드가 필요합니다.' }) };
   }
+
+  const systemPrompt = LEVEL_PROMPTS[level] || LEVEL_PROMPTS.simple;
 
   try {
     const res = await fetch(GROQ_URL, {
@@ -52,7 +69,7 @@ exports.handler = async (event) => {
       body: JSON.stringify({
         model: MODEL,
         messages: [
-          { role: 'system', content: SYSTEM_PROMPT },
+          { role: 'system', content: systemPrompt },
           { role: 'user', content: text },
         ],
         temperature: 0.3,
