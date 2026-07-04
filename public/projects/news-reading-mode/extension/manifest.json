@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "뉴스 쉬운말 모드",
   "version": "1.0.0",
-  "description": "네이버뉴스, 다음뉴스, 한국경제 기사 페이지에 플로팅 버튼을 띄우고, 클릭하면 AI가 본문을 쉬운 말로 바꿔줍니다.",
+  "description": "네이버뉴스, 다음뉴스, 한국경제, 중앙일보, 동아일보, 한겨레, 연합뉴스, 조선일보 기사 페이지에 플로팅 버튼을 띄우고, 클릭하면 AI가 본문을 쉬운 말로 바꿔줍니다.",
   "content_scripts": [
     {
       "matches": [
@@ -10,7 +10,12 @@
         "https://n.news.naver.com/*",
         "https://v.daum.net/*",
         "https://news.daum.net/*",
-        "https://www.hankyung.com/article/*"
+        "https://www.hankyung.com/article/*",
+        "https://www.joongang.co.kr/article/*",
+        "https://www.donga.com/news/*",
+        "https://www.hani.co.kr/arti/*",
+        "https://www.yna.co.kr/view/*",
+        "https://www.chosun.com/*"
       ],
       "js": ["content.js"],
       "css": ["content.css"],

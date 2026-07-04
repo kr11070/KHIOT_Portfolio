@@ -7,13 +7,22 @@
     { host: /(^|\.)v\.daum\.net$/, selector: '.article_view, #harmonyContainer' },
     { host: /(^|\.)news\.daum\.net$/, selector: '.article_view, #harmonyContainer' },
     { host: /(^|\.)hankyung\.com$/, selector: 'div.article-contents, .article-body' },
+    { host: /(^|\.)joongang\.co\.kr$/, selector: '#article_body' },
+    { host: /(^|\.)donga\.com$/, selector: '.news_body' },
+    { host: /(^|\.)hani\.co\.kr$/, selector: '.article-text' },
+    { host: /(^|\.)yna\.co\.kr$/, selector: '#articleWrap' },
+    // 조선일보는 자바스크립트로 기사를 나중에 그려주는 방식이라 선택자를 확정 검증하지 못했음.
+    // 아래 selector가 안 맞으면 findArticleContainer의 <article> 태그 대체 로직으로 넘어감.
+    { host: /(^|\.)chosun\.com$/, selector: 'article, .article-body' },
   ];
 
   function findArticleContainer() {
     const host = window.location.hostname;
     const config = SITE_CONFIGS.find((c) => c.host.test(host));
-    if (!config) return null;
-    return document.querySelector(config.selector);
+    const configured = config ? document.querySelector(config.selector) : null;
+    if (configured) return configured;
+    // 등록된 선택자가 없거나 페이지 구조가 달라 못 찾은 경우, 마지막으로 <article> 태그를 시도.
+    return document.querySelector('article');
   }
 
   const container = findArticleContainer();
