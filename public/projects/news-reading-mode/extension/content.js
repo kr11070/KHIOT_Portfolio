@@ -32,18 +32,48 @@
   const originalHtml = container.innerHTML;
   const originalText = container.innerText.trim().slice(0, 6000);
 
-  // 원문 → 쉬운말 → 쉽게읽기 → 원문 순으로 순환. 버튼 라벨은 "누르면 다음에 될 상태"를 보여준다.
+  // Agile Squad 프로토타입과 동일한 3단계: 원문(0) / 쉬운말(1) / 쉽게읽기(2)
   const LEVELS = ['original', 'simple', 'easy'];
-  const NEXT_LABEL = { original: '쉬운말', simple: '쉽게읽기', easy: '원문' };
-  let levelIndex = 0;
-  const memoryCache = {}; // { simple: html, easy: html } - 이 페이지를 보는 동안만 유지
+  const LEVEL_TOPS = [15, 50, 85]; // 트랙 안에서 각 단계의 점/노브 위치(%)
+  let appliedLevel = 0; // 현재 본문에 적용된 단계
+  let loading = false;
+  const memoryCache = {}; // { simple: html, easy: html } — 이 페이지를 보는 동안만 유지
 
-  const btn = document.createElement('button');
-  btn.id = 'nrm-floating-btn';
-  btn.type = 'button';
-  btn.dataset.state = 'off';
-  btn.innerText = NEXT_LABEL[LEVELS[levelIndex]];
-  document.body.appendChild(btn);
+  // ── 세로 슬라이더 UI (프로토타입의 rlv 구조 이식) ──
+  const root = document.createElement('div');
+  root.id = 'nrm-slider';
+  root.setAttribute('role', 'group');
+  root.setAttribute('aria-label', '읽기 난이도 선택');
+  root.innerHTML =
+    '<span class="nrm-rlv-label active" data-level="0">원문</span>' +
+    '<div class="nrm-rlv-track">' +
+    '  <span class="nrm-rlv-dot active" style="top:' + LEVEL_TOPS[0] + '%"></span>' +
+    '  <span class="nrm-rlv-dot" style="top:' + LEVEL_TOPS[1] + '%"></span>' +
+    '  <span class="nrm-rlv-dot" style="top:' + LEVEL_TOPS[2] + '%"></span>' +
+    '  <div class="nrm-rlv-knob" style="top:' + LEVEL_TOPS[0] + '%"><div class="nrm-rlv-knob-dot"></div></div>' +
+    '</div>' +
+    '<span class="nrm-rlv-label" data-level="2">쉽게읽기</span>';
+  document.body.appendChild(root);
+
+  const track = root.querySelector('.nrm-rlv-track');
+  const knob = root.querySelector('.nrm-rlv-knob');
+  const dots = root.querySelectorAll('.nrm-rlv-dot');
+  const labels = root.querySelectorAll('.nrm-rlv-label');
+
+  function setKnob(levelIndex) {
+    knob.style.top = LEVEL_TOPS[levelIndex] + '%';
+    dots.forEach((d, i) => d.classList.toggle('active', i === levelIndex));
+    labels.forEach((l) => l.classList.toggle('active', Number(l.dataset.level) === levelIndex));
+  }
+
+  // 단계 전환 시 이전 노브 자리에 잔상을 남기고 페이드아웃 (프로토타입의 ghost 효과)
+  function spawnGhost(levelIndex) {
+    const ghost = document.createElement('div');
+    ghost.className = 'nrm-rlv-knob-ghost';
+    ghost.style.top = LEVEL_TOPS[levelIndex] + '%';
+    track.appendChild(ghost);
+    setTimeout(() => ghost.remove(), 1000);
+  }
 
   function showToast(message) {
     const existing = document.getElementById('nrm-toast');
@@ -95,29 +125,30 @@
     });
   }
 
-  function setButtonToLevel(nextIndex, state) {
-    levelIndex = nextIndex;
-    btn.dataset.state = state;
-    btn.innerText = NEXT_LABEL[LEVELS[levelIndex]];
-  }
-
-  async function applyLevel(nextIndex) {
+  async function selectLevel(nextIndex) {
+    if (loading || nextIndex === appliedLevel) return;
     const level = LEVELS[nextIndex];
+    const prevIndex = appliedLevel;
 
     if (level === 'original') {
       container.innerHTML = originalHtml;
-      setButtonToLevel(nextIndex, 'off');
+      spawnGhost(prevIndex);
+      appliedLevel = nextIndex;
+      setKnob(nextIndex);
       return;
     }
 
     if (memoryCache[level]) {
       container.innerHTML = memoryCache[level];
-      setButtonToLevel(nextIndex, 'on');
+      spawnGhost(prevIndex);
+      appliedLevel = nextIndex;
+      setKnob(nextIndex);
       return;
     }
 
-    btn.dataset.state = 'loading';
-    btn.innerText = '변환중';
+    loading = true;
+    knob.classList.add('loading');
+    setKnob(nextIndex); // 노브는 먼저 이동시키고, 실패하면 되돌린다
 
     try {
       let html = await loadFromStorage(level);
@@ -128,16 +159,41 @@
       }
       memoryCache[level] = html;
       container.innerHTML = html;
-      setButtonToLevel(nextIndex, 'on');
+      spawnGhost(prevIndex);
+      appliedLevel = nextIndex;
     } catch (err) {
-      setButtonToLevel(levelIndex, levelIndex === 0 ? 'off' : 'on');
-      showToast('쉬운말 변환에 실패했어요: ' + err.message);
+      setKnob(prevIndex);
+      showToast('변환에 실패했어요: ' + err.message);
+    } finally {
+      loading = false;
+      knob.classList.remove('loading');
     }
   }
 
-  btn.addEventListener('click', () => {
-    if (btn.dataset.state === 'loading') return;
-    const nextIndex = (levelIndex + 1) % LEVELS.length;
-    applyLevel(nextIndex);
+  // 트랙 클릭/드래그 → Y좌표 비율로 단계 계산 (프로토타입 로직 이식)
+  let dragging = false;
+
+  function levelFromEvent(e) {
+    const rect = track.getBoundingClientRect();
+    const ratio = Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height));
+    return ratio < 0.3 ? 0 : ratio > 0.7 ? 2 : 1;
+  }
+
+  track.addEventListener('pointerdown', (e) => {
+    dragging = true;
+    try { track.setPointerCapture(e.pointerId); } catch (_) {}
+    selectLevel(levelFromEvent(e));
   });
+
+  track.addEventListener('pointermove', (e) => {
+    if (!dragging) return;
+    selectLevel(levelFromEvent(e));
+  });
+
+  track.addEventListener('pointerup', (e) => {
+    dragging = false;
+    try { track.releasePointerCapture(e.pointerId); } catch (_) {}
+  });
+
+  labels.forEach((l) => l.addEventListener('click', () => selectLevel(Number(l.dataset.level))));
 })();
