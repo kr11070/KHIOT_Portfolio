@@ -115,8 +115,9 @@
   transition: opacity 0.22s ease;
 }
 
-.nrm-fade-out {
-  opacity: 0 !important;
+/* 드래그 중에는 트랜지션을 꺼서 투명도가 노브 위치에 1:1로 즉각 반응 */
+.nrm-fade-drag {
+  transition: none !important;
 }
 
 #nrm-toast {

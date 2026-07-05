@@ -35,9 +35,13 @@
   // Agile Squad 프로토타입과 동일한 3단계: 원문(0) / 쉬운말(1) / 쉽게읽기(2)
   const LEVELS = ['original', 'simple', 'easy'];
   const LEVEL_TOPS = [15, 50, 85]; // 트랙 안에서 각 단계의 점/노브 위치(%)
-  let appliedLevel = 0; // 현재 본문에 적용된 단계
-  let busy = false; // 변환 요청 또는 페이드 전환이 진행 중인 동안 true
+  const HALF_GAP = (LEVEL_TOPS[1] - LEVEL_TOPS[0]) / 2; // 인접 단계 중간 지점까지의 거리
+
+  let appliedLevel = 0; // 마지막으로 확정된 단계
+  let displayedIndex = 0; // 지금 본문에 실제로 표시 중인 단계 (드래그 중엔 확정 전에도 바뀜)
+  let busy = false; // 확정 후 변환/페이드가 끝날 때까지 true
   const memoryCache = {}; // { simple: html, easy: html } — 이 페이지를 보는 동안만 유지
+  const prefetching = {}; // { simple: Promise, easy: Promise } — 진행 중인 변환 요청 중복 방지
 
   // ── 세로 슬라이더 UI (프로토타입의 rlv 구조 이식) ──
   const root = document.createElement('div');
@@ -62,6 +66,10 @@
 
   function setKnob(levelIndex) {
     knob.style.top = LEVEL_TOPS[levelIndex] + '%';
+    highlightLevel(levelIndex);
+  }
+
+  function highlightLevel(levelIndex) {
     dots.forEach((d, i) => d.classList.toggle('active', i === levelIndex));
     labels.forEach((l) => l.classList.toggle('active', Number(l.dataset.level) === levelIndex));
   }
@@ -100,7 +108,7 @@
       .join('');
   }
 
-  async function requestSimplifiedText(rawText, level) {
+  function requestSimplifiedText(rawText, level) {
     return new Promise((resolve, reject) => {
       chrome.runtime.sendMessage({ type: 'NRM_SIMPLIFY', text: rawText, level }, (response) => {
         if (chrome.runtime.lastError) {
@@ -116,76 +124,103 @@
     });
   }
 
+  // 이미 캐시된 내용이 있으면 동기적으로 반환 (원문 포함). 없으면 null.
+  function contentForLevel(levelIndex) {
+    if (levelIndex === 0) return originalHtml;
+    return memoryCache[LEVELS[levelIndex]] || null;
+  }
+
+  // 해당 단계의 변환 결과를 확보 (storage 캐시 → 없으면 AI 요청). 중복 요청은 하나로 합쳐짐.
+  function ensureContent(level) {
+    if (memoryCache[level]) return Promise.resolve(memoryCache[level]);
+    if (prefetching[level]) return prefetching[level];
+    const p = (async () => {
+      let html = await loadFromStorage(level);
+      if (!html) {
+        const simplifiedText = await requestSimplifiedText(originalText, level);
+        html = textToHtml(simplifiedText);
+        saveToStorage(level, html);
+      }
+      memoryCache[level] = html;
+      return html;
+    })();
+    prefetching[level] = p;
+    p.then(
+      () => { delete prefetching[level]; },
+      () => { delete prefetching[level]; } // 실패 시 다음에 재시도할 수 있게 비워둔다
+    );
+    return p;
+  }
+
   const FADE_MS = 220;
 
-  // 본문을 페이드아웃 → 내용 교체 → 페이드인으로 부드럽게 전환
-  function swapContent(html) {
+  // 트랜지션을 켠 상태로 본문 투명도를 목표값까지 페이드
+  function fadeOpacityTo(value) {
     return new Promise((resolve) => {
       container.classList.add('nrm-fade');
-      container.classList.add('nrm-fade-out');
-      setTimeout(() => {
-        container.innerHTML = html;
-        void container.offsetWidth; // 강제 리플로우로 트랜지션 재시작 보장
-        container.classList.remove('nrm-fade-out');
-        setTimeout(resolve, FADE_MS);
-      }, FADE_MS);
+      container.classList.remove('nrm-fade-drag');
+      container.style.opacity = String(value);
+      setTimeout(resolve, FADE_MS);
     });
   }
 
-  async function selectLevel(nextIndex) {
+  // ── 단계 확정 (드래그 놓기 / 라벨 클릭) ──
+  async function commitLevel(targetIndex) {
     if (busy) return;
-    if (nextIndex === appliedLevel) {
-      setKnob(nextIndex); // 드래그 후 제자리로 스냅만
+    setKnob(targetIndex);
+
+    // 드래그 중 이미 해당 단계 내용이 표시된 상태면, 투명도만 다시 올리면 끝
+    if (targetIndex === displayedIndex) {
+      appliedLevel = targetIndex;
+      fadeOpacityTo(1);
       return;
     }
-    const level = LEVELS[nextIndex];
-    const prevIndex = appliedLevel;
+
     busy = true;
-    setKnob(nextIndex); // 노브는 먼저 이동시키고, 실패하면 되돌린다
+    const level = LEVELS[targetIndex];
+    const needsFetch = !contentForLevel(targetIndex);
+    if (needsFetch) knob.classList.add('loading');
 
     try {
-      let html;
-      if (level === 'original') {
-        html = originalHtml;
-      } else if (memoryCache[level]) {
-        html = memoryCache[level];
-      } else {
-        knob.classList.add('loading');
-        html = await loadFromStorage(level);
-        if (!html) {
-          const simplifiedText = await requestSimplifiedText(originalText, level);
-          html = textToHtml(simplifiedText);
-          saveToStorage(level, html);
-        }
-        memoryCache[level] = html;
-        knob.classList.remove('loading');
-      }
-      await swapContent(html);
-      appliedLevel = nextIndex;
+      const html = targetIndex === 0 ? originalHtml : await ensureContent(level);
+      knob.classList.remove('loading');
+      await fadeOpacityTo(0);
+      container.innerHTML = html;
+      displayedIndex = targetIndex;
+      await fadeOpacityTo(1);
+      appliedLevel = targetIndex;
     } catch (err) {
       knob.classList.remove('loading');
-      setKnob(prevIndex);
+      setKnob(appliedLevel);
+      // 드래그 중 다른 단계 내용이 표시돼 있었다면 확정 단계의 내용으로 되돌린다
+      if (displayedIndex !== appliedLevel) {
+        const fallback = contentForLevel(appliedLevel);
+        if (fallback) {
+          container.innerHTML = fallback;
+          displayedIndex = appliedLevel;
+        }
+      }
+      fadeOpacityTo(1);
       showToast('변환에 실패했어요: ' + err.message);
     } finally {
       busy = false;
     }
   }
 
-  // ── 트랙 드래그: 노브가 포인터를 연속적으로 따라오고, 놓으면 가장 가까운 단계로 스냅 ──
+  // ── 트랙 드래그: 노브가 포인터를 연속적으로 따라오고, 본문도 실시간으로 페이드 ──
   // 이동/놓기 이벤트는 window에서 받는다. 트랙 요소에만 걸면 포인터가 트랙을 벗어났을 때
-  // pointerup을 놓쳐 드래그 상태가 꼬일 수 있다 (두 번째 드래그가 안 잡히던 원인).
+  // pointerup을 놓쳐 드래그 상태가 꼬일 수 있다.
   const MIN_TOP = LEVEL_TOPS[0];
   const MAX_TOP = LEVEL_TOPS[LEVEL_TOPS.length - 1];
   let dragging = false;
+  let lastTopPercent = LEVEL_TOPS[0];
 
-  // 포인터 Y좌표 → 트랙 안에서의 노브 위치(%). 점 범위(15~85%) 밖으로는 못 나가게 클램프.
   function topPercentFromEvent(e) {
     const rect = track.getBoundingClientRect();
     const ratio = Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height));
     return Math.max(MIN_TOP, Math.min(MAX_TOP, ratio * 100));
   }
 
-  // 현재 노브 위치(%)에서 가장 가까운 단계 인덱스
   function nearestLevel(topPercent) {
     let best = 0;
     let bestDist = Infinity;
@@ -199,12 +234,36 @@
     return best;
   }
 
-  function moveKnobFree(topPercent) {
+  function onDragMove(topPercent) {
+    lastTopPercent = topPercent;
     knob.style.top = topPercent + '%';
-    // 드래그 중에는 가장 가까운 단계를 점/라벨 하이라이트로만 미리 보여준다 (변환은 아직 안 함)
+
     const near = nearestLevel(topPercent);
-    dots.forEach((d, i) => d.classList.toggle('active', i === near));
-    labels.forEach((l) => l.classList.toggle('active', Number(l.dataset.level) === near));
+    highlightLevel(near);
+
+    // 중간 지점을 넘어 다른 단계 구역에 들어가면, 준비된 내용이 있을 때 본문을 바로 교체
+    if (near !== displayedIndex) {
+      const html = contentForLevel(near);
+      if (html) {
+        container.innerHTML = html;
+        displayedIndex = near;
+      } else {
+        // 아직 변환 안 된 단계면 드래그 중에 미리 요청을 시작해둔다 (놓을 때쯤 준비되도록)
+        ensureContent(LEVELS[near])
+          .then((h) => {
+            if (dragging && nearestLevel(lastTopPercent) === near && displayedIndex !== near) {
+              container.innerHTML = h;
+              displayedIndex = near;
+            }
+          })
+          .catch(() => {}); // 드래그 중 프리페치 실패는 조용히 넘기고, 놓을 때 다시 시도
+      }
+    }
+
+    // 노브가 단계 중심에서 멀어질수록 본문이 투명해짐 (중간 지점에서 최소 10%)
+    const dist = Math.abs(topPercent - LEVEL_TOPS[near]);
+    const t = Math.min(1, dist / HALF_GAP);
+    container.style.opacity = String(1 - t * 0.9);
   }
 
   track.addEventListener('pointerdown', (e) => {
@@ -212,23 +271,24 @@
     e.preventDefault();
     dragging = true;
     knob.classList.add('dragging'); // top 트랜지션 끄기 → 포인터에 1:1로 붙어서 움직임
-    moveKnobFree(topPercentFromEvent(e));
+    container.classList.add('nrm-fade', 'nrm-fade-drag'); // 투명도도 트랜지션 없이 즉각 반응
+    onDragMove(topPercentFromEvent(e));
   });
 
   window.addEventListener('pointermove', (e) => {
     if (!dragging) return;
-    moveKnobFree(topPercentFromEvent(e));
+    onDragMove(topPercentFromEvent(e));
   });
 
   function endDrag(e) {
     if (!dragging) return;
     dragging = false;
     knob.classList.remove('dragging'); // 트랜지션 다시 켜기 → 스냅이 부드럽게
-    selectLevel(nearestLevel(topPercentFromEvent(e)));
+    commitLevel(nearestLevel(topPercentFromEvent(e)));
   }
 
   window.addEventListener('pointerup', endDrag);
   window.addEventListener('pointercancel', endDrag);
 
-  labels.forEach((l) => l.addEventListener('click', () => selectLevel(Number(l.dataset.level))));
+  labels.forEach((l) => l.addEventListener('click', () => commitLevel(Number(l.dataset.level))));
 })();
