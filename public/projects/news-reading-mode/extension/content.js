@@ -106,7 +106,7 @@
     '  <span class="nrm-rlv-dot active" style="top:' + LEVEL_TOPS[0] + '%"></span>' +
     '  <span class="nrm-rlv-dot" style="top:' + LEVEL_TOPS[1] + '%"></span>' +
     '  <span class="nrm-rlv-dot" style="top:' + LEVEL_TOPS[2] + '%"></span>' +
-    '  <div class="nrm-rlv-knob" style="top:' + LEVEL_TOPS[0] + '%"><div class="nrm-rlv-knob-dot"></div></div>' +
+    '  <div class="nrm-rlv-knob"><div class="nrm-rlv-knob-dot"></div></div>' +
     '</div>' +
     '<span class="nrm-rlv-label" data-level="2">쉬운말</span>';
   document.body.appendChild(root);
@@ -116,10 +116,21 @@
   const dots = root.querySelectorAll('.nrm-rlv-dot');
   const labels = root.querySelectorAll('.nrm-rlv-label');
 
+  // 노브는 top(%) 대신 transform: translateY(px)로 움직인다.
+  // top은 매 프레임 레이아웃을 다시 계산해야 하는 속성이라, 빠르게 움직일 때
+  // 원 모양이 위아래로 늘어져 보이는 렌더링 아티팩트가 생길 수 있다.
+  // transform은 GPU 합성(compositing)만으로 처리되어 항상 매끈하게 움직인다.
+  function setKnobPercent(percent) {
+    const px = (percent / 100) * track.clientHeight;
+    knob.style.transform = `translate(-50%, -50%) translateY(${px}px)`;
+  }
+
   function setKnob(levelIndex) {
-    knob.style.top = LEVEL_TOPS[levelIndex] + '%';
+    setKnobPercent(LEVEL_TOPS[levelIndex]);
     highlightLevel(levelIndex);
   }
+
+  setKnobPercent(LEVEL_TOPS[0]); // 초기 위치 지정 (transition 없이 즉시)
 
   function highlightLevel(levelIndex) {
     dots.forEach((d, i) => d.classList.toggle('active', i === levelIndex));
@@ -315,7 +326,7 @@
 
   function onDragMove(topPercent) {
     lastTopPercent = topPercent;
-    knob.style.top = topPercent + '%';
+    setKnobPercent(topPercent);
 
     const near = nearestLevel(topPercent);
     highlightLevel(near);

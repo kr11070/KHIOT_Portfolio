@@ -71,14 +71,15 @@
 .nrm-rlv-knob {
   position: absolute;
   left: 50%;
+  top: 0;
   width: 40px;
   height: 40px;
   border-radius: 50%;
   background: #fff;
   border: 2px solid #143c7e;
   box-shadow: 0 4px 12px rgba(20, 60, 126, 0.18);
-  transform: translate(-50%, -50%);
-  transition: top 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+  /* 위치는 top이 아니라 transform: translateY(px)로 제어 (GPU 합성, 늘어짐 아티팩트 없음) */
+  transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -93,7 +94,7 @@
   background: #143c7e;
 }
 
-/* 드래그 중: 트랜지션을 꺼서 노브가 포인터에 1:1로 붙어 움직이게 */
+/* 드래그 중: transform 트랜지션을 꺼서 노브가 포인터에 1:1로 붙어 움직이게 */
 .nrm-rlv-knob.dragging {
   transition: none;
   cursor: grabbing;
