@@ -29,6 +29,22 @@ const LEVEL_PROMPTS = {
     COMMON_RULES,
 };
 
+// llama-3.3-70b-versatile가 일본어 원문의 숫자/단위/회사 접미사 한자·가나를
+// 지시에도 불구하고 그대로 남기는 경우가 있어(예: "10兆ウォン"), 번역 결과에
+// 한해 자주 나오는 패턴을 후처리로 한국어 표기로 치환한다.
+function fixJapaneseLeakage(text) {
+  return text
+    .replace(/株式会社/g, '주식회사')
+    .replace(/兆/g, '조')
+    .replace(/億/g, '억')
+    .replace(/万/g, '만')
+    .replace(/ウォン/g, '원')
+    .replace(/ドル/g, '달러')
+    .replace(/円/g, '엔')
+    .replace(/\s*社/g, '')
+    .replace(/[ \t]{2,}/g, ' ');
+}
+
 exports.handler = async (event) => {
   const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
@@ -94,11 +110,13 @@ exports.handler = async (event) => {
     }
 
     const data = await res.json();
-    const simplifiedText = data.choices?.[0]?.message?.content?.trim();
+    let simplifiedText = data.choices?.[0]?.message?.content?.trim();
 
     if (!simplifiedText) {
       return { statusCode: 502, headers: corsHeaders, body: JSON.stringify({ error: 'Groq 응답에서 텍스트를 찾지 못했습니다.' }) };
     }
+
+    if (level === 'translate') simplifiedText = fixJapaneseLeakage(simplifiedText);
 
     return {
       statusCode: 200,
