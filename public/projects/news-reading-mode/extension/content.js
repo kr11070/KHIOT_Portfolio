@@ -51,15 +51,22 @@
   function extractImageItems(html) {
     const tmp = document.createElement('div');
     tmp.innerHTML = html;
-    // 지연 로딩(lazy-load) 이미지는 src가 비어 있을 수 있어 data-* 속성에서 복원
+    // 지연 로딩(lazy-load) 이미지는 진짜 사진이 로드되기 전까지 src에 흐린 플레이스홀더나
+    // 투명 픽셀을 넣어두는 경우가 많다. src가 비어 있을 때뿐 아니라, data-* 속성에
+    // 진짜 주소가 있으면 항상 그걸 우선해서 플레이스홀더를 덮어써야 한다.
     tmp.querySelectorAll('img').forEach((img) => {
-      if (!img.getAttribute('src')) {
-        const lazy =
-          img.getAttribute('data-src') ||
-          img.getAttribute('data-lazy-src') ||
-          img.getAttribute('data-original');
-        if (lazy) img.setAttribute('src', lazy);
-      }
+      const lazySrc =
+        img.getAttribute('data-src') ||
+        img.getAttribute('data-lazy-src') ||
+        img.getAttribute('data-original') ||
+        img.getAttribute('data-original-src');
+      if (lazySrc) img.setAttribute('src', lazySrc);
+
+      const lazySrcset = img.getAttribute('data-srcset');
+      if (lazySrcset) img.setAttribute('srcset', lazySrcset);
+
+      // "loading=lazy"가 남아있으면 브라우저가 뷰포트 근처까지 또 로드를 미룰 수 있어 제거
+      img.removeAttribute('loading');
     });
     const totalTextLen = (tmp.textContent || '').length || 1;
     const seen = new Set();
@@ -147,9 +154,9 @@
     setTimeout(() => toast.remove(), 4000);
   }
 
-  // v4: 변환본에 .nrm-converted 레이아웃 래퍼가 추가된 형식
+  // v5: 지연 로딩 플레이스홀더 대신 실제 이미지 주소를 항상 우선 사용하도록 추출 로직 변경
   function storageKey(level) {
-    return `nrm-cache:v4:${location.href}:${level}`;
+    return `nrm-cache:v5:${location.href}:${level}`;
   }
 
   function loadFromStorage(level) {
