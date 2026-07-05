@@ -197,9 +197,10 @@
     setTimeout(() => toast.remove(), 4000);
   }
 
-  // v5: 지연 로딩 플레이스홀더 대신 실제 이미지 주소를 항상 우선 사용하도록 추출 로직 변경
+  // v6: 외국어 기사의 쉬운말/쉬운말이 원문 언어를 유지하도록 바뀜 — 한국어로 잘못
+  // 변환돼 저장된 이전 캐시(v5 이하)를 무효화하기 위해 버전을 올림
   function storageKey(level) {
-    return `nrm-cache:v5:${location.href}:${level}`;
+    return `nrm-cache:v6:${location.href}:${level}`;
   }
 
   function loadFromStorage(level) {
