@@ -32,6 +32,39 @@
   const originalHtml = container.innerHTML;
   const originalText = container.innerText.trim().slice(0, 6000);
 
+  // 원문에 있던 이미지(figure/img)를 추출해서 변환본에도 그대로 붙여준다.
+  function extractImagesHtml(html) {
+    const tmp = document.createElement('div');
+    tmp.innerHTML = html;
+    // 지연 로딩(lazy-load) 이미지는 src가 비어 있을 수 있어 data-* 속성에서 복원
+    tmp.querySelectorAll('img').forEach((img) => {
+      if (!img.getAttribute('src')) {
+        const lazy =
+          img.getAttribute('data-src') ||
+          img.getAttribute('data-lazy-src') ||
+          img.getAttribute('data-original');
+        if (lazy) img.setAttribute('src', lazy);
+      }
+    });
+    const seen = new Set();
+    const parts = [];
+    tmp.querySelectorAll('figure, img').forEach((el) => {
+      if (el.tagName === 'IMG') {
+        if (el.closest('figure')) return; // figure 안의 img는 figure 쪽에서 한 번만 수집
+      } else if (!el.querySelector('img')) {
+        return; // 이미지가 없는 figure는 제외
+      }
+      const img = el.tagName === 'IMG' ? el : el.querySelector('img');
+      const src = img.getAttribute('src');
+      if (!src || seen.has(src)) return;
+      seen.add(src);
+      parts.push(el.outerHTML);
+    });
+    return parts.join('');
+  }
+
+  const imagesHtml = extractImagesHtml(originalHtml);
+
   // Agile Squad 프로토타입과 동일한 3단계: 원문(0) / 쉬운말(1) / 쉽게읽기(2)
   const LEVELS = ['original', 'simple', 'easy'];
   const LEVEL_TOPS = [15, 50, 85]; // 트랙 안에서 각 단계의 점/노브 위치(%)
@@ -56,7 +89,7 @@
     '  <span class="nrm-rlv-dot" style="top:' + LEVEL_TOPS[2] + '%"></span>' +
     '  <div class="nrm-rlv-knob" style="top:' + LEVEL_TOPS[0] + '%"><div class="nrm-rlv-knob-dot"></div></div>' +
     '</div>' +
-    '<span class="nrm-rlv-label" data-level="2">쉽게읽기</span>';
+    '<span class="nrm-rlv-label" data-level="2">쉬운말</span>';
   document.body.appendChild(root);
 
   const track = root.querySelector('.nrm-rlv-track');
@@ -84,8 +117,9 @@
     setTimeout(() => toast.remove(), 4000);
   }
 
+  // v2: 변환본에 원문 이미지가 포함되도록 형식이 바뀌어 이전 캐시와 구분
   function storageKey(level) {
-    return `nrm-cache:${location.href}:${level}`;
+    return `nrm-cache:v2:${location.href}:${level}`;
   }
 
   function loadFromStorage(level) {
@@ -101,11 +135,13 @@
   }
 
   function textToHtml(text) {
-    return text
+    const paragraphs = text
       .split('\n')
       .filter((line) => line.trim().length > 0)
       .map((line) => `<p>${line.trim()}</p>`)
       .join('');
+    // 원문에 이미지가 있었다면 변환된 본문 아래에 그대로 이어 붙인다
+    return paragraphs + (imagesHtml ? '<div class="nrm-images">' + imagesHtml + '</div>' : '');
   }
 
   function requestSimplifiedText(rawText, level) {

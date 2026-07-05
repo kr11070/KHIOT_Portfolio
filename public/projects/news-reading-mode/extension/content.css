@@ -120,6 +120,22 @@
   transition: none !important;
 }
 
+/* 변환본 하단에 붙는 원문 이미지 영역 */
+.nrm-images {
+  margin-top: 24px;
+}
+
+.nrm-images img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 16px auto;
+}
+
+.nrm-images figure {
+  margin: 16px 0;
+}
+
 #nrm-toast {
   position: fixed;
   bottom: 92px;
