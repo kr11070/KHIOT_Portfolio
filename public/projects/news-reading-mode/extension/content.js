@@ -136,9 +136,9 @@
     setTimeout(() => toast.remove(), 4000);
   }
 
-  // v3: 이미지가 본문 하단 모음이 아니라 원문 내 위치 비율대로 삽입되는 형식
+  // v4: 변환본에 .nrm-converted 레이아웃 래퍼가 추가된 형식
   function storageKey(level) {
-    return `nrm-cache:v3:${location.href}:${level}`;
+    return `nrm-cache:v4:${location.href}:${level}`;
   }
 
   function loadFromStorage(level) {
@@ -153,31 +153,38 @@
     chrome.storage.local.set({ [storageKey(level)]: html });
   }
 
+  // 원문 사이트 고유 스타일은 건드리지 않도록, 변환된 본문에만 프로토타입 스타일 래퍼(.nrm-converted)를 씌운다.
   function textToHtml(text) {
     const lines = text
       .split('\n')
       .filter((line) => line.trim().length > 0)
       .map((line) => `<p>${line.trim()}</p>`);
-    if (!imageItems.length) return lines.join('');
 
-    // 각 이미지를 원문에서의 상대 위치(ratio)에 해당하는 문단 사이에 삽입한다.
-    // 예: 원문 40% 지점에 있던 사진은 변환본에서도 문단 수 기준 40% 지점에 들어간다.
-    const n = lines.length;
-    const inserts = new Map(); // "lines[idx] 바로 앞" 위치 → 삽입할 이미지 HTML 목록
-    imageItems.forEach((item) => {
-      const idx = Math.max(0, Math.min(n, Math.round(item.ratio * n)));
-      if (!inserts.has(idx)) inserts.set(idx, []);
-      inserts.get(idx).push(item.html);
-    });
+    let body;
+    if (!imageItems.length) {
+      body = lines.join('');
+    } else {
+      // 각 이미지를 원문에서의 상대 위치(ratio)에 해당하는 문단 사이에 삽입한다.
+      // 예: 원문 40% 지점에 있던 사진은 변환본에서도 문단 수 기준 40% 지점에 들어간다.
+      const n = lines.length;
+      const inserts = new Map(); // "lines[idx] 바로 앞" 위치 → 삽입할 이미지 HTML 목록
+      imageItems.forEach((item) => {
+        const idx = Math.max(0, Math.min(n, Math.round(item.ratio * n)));
+        if (!inserts.has(idx)) inserts.set(idx, []);
+        inserts.get(idx).push(item.html);
+      });
 
-    const result = [];
-    for (let i = 0; i <= n; i++) {
-      if (inserts.has(i)) {
-        result.push('<div class="nrm-image">' + inserts.get(i).join('') + '</div>');
+      const result = [];
+      for (let i = 0; i <= n; i++) {
+        if (inserts.has(i)) {
+          result.push('<div class="nrm-image">' + inserts.get(i).join('') + '</div>');
+        }
+        if (i < n) result.push(lines[i]);
       }
-      if (i < n) result.push(lines[i]);
+      body = result.join('');
     }
-    return result.join('');
+
+    return '<div class="nrm-converted">' + body + '</div>';
   }
 
   function requestSimplifiedText(rawText, level) {

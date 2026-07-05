@@ -120,20 +120,55 @@
   transition: none !important;
 }
 
-/* 변환본 문단 사이에 원래 위치대로 끼워지는 원문 이미지 */
-.nrm-image {
-  margin: 20px 0;
+/* ── 변환된 본문 레이아웃 (Agile Squad 프로토타입의 .art-body 스타일 이식) ── */
+/* 원문(level 0)은 각 뉴스 사이트 고유 디자인을 그대로 두고, 변환본에만 이 스타일을 씌운다. */
+.nrm-converted {
+  font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Noto Sans KR', -apple-system, sans-serif !important;
+  font-size: 16px !important;
+  color: #333 !important;
+  line-height: 1.9 !important;
 }
 
-.nrm-image img {
+/* 문단마다 아래 여백을 둬서 문단이 뚜렷하게 나뉘어 보이게 함 (사이트 자체 CSS보다 우선 적용) */
+.nrm-converted p {
+  margin: 0 0 20px !important;
+  font-size: inherit !important;
+  line-height: inherit !important;
+  color: inherit !important;
+}
+
+.nrm-converted p:last-child {
+  margin-bottom: 0;
+}
+
+.nrm-converted strong {
+  color: #191f28;
+}
+
+/* 변환본 문단 사이에 원래 위치대로 끼워지는 원문 이미지 (프로토타입의 .art-figure 스타일 이식) */
+.nrm-converted .nrm-image {
+  margin: 24px 0;
+}
+
+.nrm-converted .nrm-image figure {
+  margin: 0;
+  border: 1px solid #e5e8eb;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.nrm-converted .nrm-image img {
   max-width: 100%;
   height: auto;
   display: block;
-  margin: 12px auto;
+  margin: 0 auto;
 }
 
-.nrm-image figure {
-  margin: 12px 0;
+.nrm-converted .nrm-image figcaption {
+  padding: 8px 12px;
+  font-size: 12px;
+  color: #8b95a1;
 }
 
 #nrm-toast {
