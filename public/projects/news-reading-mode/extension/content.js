@@ -91,18 +91,41 @@
 
   const imageItems = extractImageItems(originalHtml);
 
-  // Agile Squad 프로토타입과 동일한 3단계: 원문(0) / 쉬운말(1) / 쉽게읽기(2)
+  // 원문이 한국어가 아니면(영어/일본어 등) 슬라이더 아래에 번역 버튼을 띄운다.
+  // 문자 종류 비율로 대략 판별: 한글이 어느 정도 섞여 있으면 한국어로 간주해 건너뛴다.
+  function detectForeignLanguage(text) {
+    const sample = text.slice(0, 800);
+    const hangul = (sample.match(/[가-힣]/g) || []).length;
+    const kana = (sample.match(/[぀-ヿ]/g) || []).length; // 히라가나/가타카나 (일본어 고유)
+    const latin = (sample.match(/[A-Za-z]/g) || []).length;
+    const letters = hangul + kana + latin;
+    if (letters < 20) return null; // 판별하기엔 글자 수가 너무 적음
+    if (hangul / letters > 0.15) return null; // 한글이 섞여 있으면 한국어로 간주
+    if (kana > 5) return 'ja';
+    if (latin / letters > 0.5) return 'en';
+    return null;
+  }
+
+  const foreignLang = detectForeignLanguage(originalText);
+
+  // Agile Squad 프로토타입과 동일한 3단계: 원문(0) / 쉬운말(1) / 쉬운말(2)
   const LEVELS = ['original', 'simple', 'easy'];
   const LEVEL_TOPS = [15, 50, 85]; // 트랙 안에서 각 단계의 점/노브 위치(%)
   const HALF_GAP = (LEVEL_TOPS[1] - LEVEL_TOPS[0]) / 2; // 인접 단계 중간 지점까지의 거리
 
   let appliedLevel = 0; // 마지막으로 확정된 단계
-  let displayedIndex = 0; // 지금 본문에 실제로 표시 중인 단계 (드래그 중엔 확정 전에도 바뀜)
+  let displayedIndex = 0; // 지금 본문에 실제로 표시 중인 단계 (드래그 중엔 확정 전에도 바뀜; 번역 표시 중엔 -1)
   let busy = false; // 확정 후 변환/페이드가 끝날 때까지 true
-  const memoryCache = {}; // { simple: html, easy: html } — 이 페이지를 보는 동안만 유지
-  const prefetching = {}; // { simple: Promise, easy: Promise } — 진행 중인 변환 요청 중복 방지
+  let translateOn = false; // 지금 번역본이 표시되고 있는지
+  const memoryCache = {}; // { simple: html, easy: html, translate: html } — 이 페이지를 보는 동안만 유지
+  const prefetching = {}; // { simple: Promise, ... } — 진행 중인 변환 요청 중복 방지
 
   // ── 세로 슬라이더 UI (프로토타입의 rlv 구조 이식) ──
+  // #nrm-panel(화면에 고정되는 바깥 껍데기) 안에 슬라이더 카드와, 필요하면 번역 버튼을 세로로 쌓는다.
+  const panel = document.createElement('div');
+  panel.id = 'nrm-panel';
+  document.body.appendChild(panel);
+
   const root = document.createElement('div');
   root.id = 'nrm-slider';
   root.setAttribute('role', 'group');
@@ -116,12 +139,22 @@
     '  <div class="nrm-rlv-knob"><div class="nrm-rlv-knob-dot"></div></div>' +
     '</div>' +
     '<span class="nrm-rlv-label" data-level="2">쉬운말</span>';
-  document.body.appendChild(root);
+  panel.appendChild(root);
 
   const track = root.querySelector('.nrm-rlv-track');
   const knob = root.querySelector('.nrm-rlv-knob');
   const dots = root.querySelectorAll('.nrm-rlv-dot');
   const labels = root.querySelectorAll('.nrm-rlv-label');
+
+  // 한국어가 아닌 기사일 때만, 슬라이더 카드 바로 아래에 번역 버튼을 추가한다.
+  let translateBtn = null;
+  if (foreignLang) {
+    translateBtn = document.createElement('button');
+    translateBtn.id = 'nrm-translate-btn';
+    translateBtn.type = 'button';
+    translateBtn.textContent = '한국어로 번역';
+    panel.appendChild(translateBtn);
+  }
 
   // 노브는 top(%) 대신 transform: translateY(px)로 움직인다.
   // top은 매 프레임 레이아웃을 다시 계산해야 하는 속성이라, 빠르게 움직일 때
@@ -142,6 +175,14 @@
   function highlightLevel(levelIndex) {
     dots.forEach((d, i) => d.classList.toggle('active', i === levelIndex));
     labels.forEach((l) => l.classList.toggle('active', Number(l.dataset.level) === levelIndex));
+  }
+
+  // 번역 버튼의 표시 상태(글자/활성 스타일)만 갱신. 실제 본문 전환은 호출부에서 처리.
+  function setTranslateState(on) {
+    if (!translateBtn) return;
+    translateOn = on;
+    translateBtn.textContent = on ? '원문 보기' : '한국어로 번역';
+    translateBtn.classList.toggle('active', on);
   }
 
   function showToast(message) {
@@ -267,7 +308,8 @@
     setKnob(targetIndex);
 
     // 드래그 중 이미 해당 단계 내용이 표시된 상태면, 투명도만 다시 올리면 끝
-    if (targetIndex === displayedIndex) {
+    // 단, 번역본이 표시 중이었다면(displayedIndex는 -1) 반드시 슬라이더 단계 내용으로 되돌려야 하므로 건너뛴다.
+    if (targetIndex === displayedIndex && !translateOn) {
       appliedLevel = targetIndex;
       fadeOpacityTo(1);
       return;
@@ -284,6 +326,7 @@
       await fadeOpacityTo(0);
       container.innerHTML = html;
       displayedIndex = targetIndex;
+      setTranslateState(false); // 슬라이더로 전환했으니 번역 버튼 상태도 원위치
       await fadeOpacityTo(1);
       appliedLevel = targetIndex;
     } catch (err) {
@@ -340,6 +383,7 @@
 
     // 중간 지점을 넘어 다른 단계 구역에 들어가면, 준비된 내용이 있을 때 본문을 바로 교체
     if (near !== displayedIndex) {
+      setTranslateState(false); // 슬라이더를 만졌으니 번역 표시 상태는 해제
       const html = contentForLevel(near);
       if (html) {
         container.innerHTML = html;
@@ -388,4 +432,50 @@
   window.addEventListener('pointercancel', endDrag);
 
   labels.forEach((l) => l.addEventListener('click', () => commitLevel(Number(l.dataset.level))));
+
+  // ── 번역 버튼: 슬라이더 단계와 별개로, 원문/번역본을 토글 ──
+  if (translateBtn) {
+    translateBtn.addEventListener('click', async () => {
+      if (busy) return;
+
+      if (translateOn) {
+        // 끄기: 슬라이더가 가리키는 현재 단계 내용으로 복귀
+        busy = true;
+        setTranslateState(false);
+        try {
+          await fadeOpacityTo(0);
+          container.innerHTML = contentForLevel(appliedLevel);
+          displayedIndex = appliedLevel;
+          await fadeOpacityTo(1);
+        } finally {
+          busy = false;
+        }
+        return;
+      }
+
+      busy = true;
+      const needsFetch = !memoryCache.translate;
+      if (needsFetch) {
+        translateBtn.classList.add('loading');
+        translateBtn.textContent = '번역 중...';
+      }
+
+      try {
+        const html = await ensureContent('translate');
+        translateBtn.classList.remove('loading');
+        await fadeOpacityTo(0);
+        container.innerHTML = html;
+        displayedIndex = -1; // 슬라이더의 세 단계 어디에도 속하지 않는 상태
+        setTranslateState(true);
+        await fadeOpacityTo(1);
+      } catch (err) {
+        translateBtn.classList.remove('loading');
+        setTranslateState(false);
+        fadeOpacityTo(1);
+        showToast('번역에 실패했어요: ' + err.message);
+      } finally {
+        busy = false;
+      }
+    });
+  }
 })();
