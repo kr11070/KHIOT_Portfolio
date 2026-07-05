@@ -117,7 +117,7 @@
   let displayedIndex = 0; // 지금 본문에 실제로 표시 중인 단계 (드래그 중엔 확정 전에도 바뀜; 번역 표시 중엔 -1)
   let busy = false; // 확정 후 변환/페이드가 끝날 때까지 true
   // 번역 버튼 자체의 on/off 표시 상태. 슬라이더를 움직여 실제 본문이 바뀌어도
-  // 이 값과 버튼 글자는 그대로 유지되고, "원문 보기"를 직접 눌러야만 꺼진다.
+  // 이 값과 버튼 글자는 그대로 유지되고, "번역 끄기"를 직접 눌러야만 꺼진다.
   let translateOn = false;
   const memoryCache = {}; // { simple: html, easy: html, translate: html } — 이 페이지를 보는 동안만 유지
   const prefetching = {}; // { simple: Promise, ... } — 진행 중인 변환 요청 중복 방지
@@ -183,7 +183,7 @@
   function setTranslateState(on) {
     if (!translateBtn) return;
     translateOn = on;
-    translateBtn.textContent = on ? '원문 보기' : '한국어로 번역';
+    translateBtn.textContent = on ? '번역 끄기' : '한국어로 번역';
     translateBtn.classList.toggle('active', on);
   }
 
@@ -328,7 +328,7 @@
       container.innerHTML = html;
       displayedIndex = targetIndex;
       // 번역 버튼의 표시 상태(텍스트/활성 스타일)는 슬라이더 조작만으로는 바꾸지 않는다.
-      // "원문 보기"를 직접 눌러야만 되돌아가도록 유지.
+      // "번역 끄기"를 직접 눌러야만 되돌아가도록 유지.
       await fadeOpacityTo(1);
       appliedLevel = targetIndex;
     } catch (err) {
@@ -384,7 +384,7 @@
     highlightLevel(near);
 
     // 중간 지점을 넘어 다른 단계 구역에 들어가면, 준비된 내용이 있을 때 본문을 바로 교체
-    // (번역 버튼의 표시 상태는 여기서 건드리지 않는다 — "원문 보기"를 직접 눌러야만 바뀐다)
+    // (번역 버튼의 표시 상태는 여기서 건드리지 않는다 — "번역 끄기"를 직접 눌러야만 바뀐다)
     if (near !== displayedIndex) {
       const html = contentForLevel(near);
       if (html) {
@@ -441,13 +441,17 @@
       if (busy) return;
 
       if (translateOn) {
-        // 끄기: 슬라이더가 가리키는 현재 단계 내용으로 복귀
+        // 끄기: 항상 번역되지 않은 진짜 원문으로 돌아간다. 슬라이더도 "원문" 위치로 리셋.
+        // (슬라이더가 쉬운말/쉬운말에 가 있었다면 그 결과는 AI가 항상 한국어로 출력하므로,
+        //  그 상태로 되돌리면 여전히 한국어라 "안 꺼진 것처럼" 보이는 문제가 있었다.)
         busy = true;
         setTranslateState(false);
         try {
           await fadeOpacityTo(0);
-          container.innerHTML = contentForLevel(appliedLevel);
-          displayedIndex = appliedLevel;
+          container.innerHTML = originalHtml;
+          displayedIndex = 0;
+          appliedLevel = 0;
+          setKnob(0);
           await fadeOpacityTo(1);
         } finally {
           busy = false;
