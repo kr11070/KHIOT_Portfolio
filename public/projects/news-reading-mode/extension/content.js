@@ -250,7 +250,9 @@
 
   function requestSimplifiedText(rawText, level) {
     return new Promise((resolve, reject) => {
-      chrome.runtime.sendMessage({ type: 'NRM_SIMPLIFY', text: rawText, level }, (response) => {
+      // foreignLang(원문이 감지된 언어)을 같이 보내서, 서버가 "쉬운말/쉬운말" 응답을
+      // 원문과 같은 언어로 확실히 고정할 수 있게 한다. translate 요청에는 영향 없음.
+      chrome.runtime.sendMessage({ type: 'NRM_SIMPLIFY', text: rawText, level, lang: foreignLang }, (response) => {
         if (chrome.runtime.lastError) {
           reject(new Error(chrome.runtime.lastError.message));
           return;
