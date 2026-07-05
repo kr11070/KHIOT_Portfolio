@@ -28,12 +28,16 @@
 }
 
 #nrm-translate-btn {
-  width: fit-content;
-  white-space: nowrap;
+  box-sizing: border-box;
+  width: 74px; /* 슬라이더 카드(트랙 34px + 좌우 패딩 20px씩)와 같은 폭 → 글자가 두 줄로 나뉨 */
+  white-space: normal;
+  word-break: keep-all;
+  text-align: center;
+  line-height: 1.35;
   background: #ffffff;
   border: 1px solid #e5e8eb;
-  border-radius: 9999px;
-  padding: 8px 14px;
+  border-radius: 16px;
+  padding: 8px 6px;
   font-size: 12px;
   font-weight: 700;
   color: #4e5968;

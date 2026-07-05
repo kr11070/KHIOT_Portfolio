@@ -116,7 +116,9 @@
   let appliedLevel = 0; // 마지막으로 확정된 단계
   let displayedIndex = 0; // 지금 본문에 실제로 표시 중인 단계 (드래그 중엔 확정 전에도 바뀜; 번역 표시 중엔 -1)
   let busy = false; // 확정 후 변환/페이드가 끝날 때까지 true
-  let translateOn = false; // 지금 번역본이 표시되고 있는지
+  // 번역 버튼 자체의 on/off 표시 상태. 슬라이더를 움직여 실제 본문이 바뀌어도
+  // 이 값과 버튼 글자는 그대로 유지되고, "원문 보기"를 직접 눌러야만 꺼진다.
+  let translateOn = false;
   const memoryCache = {}; // { simple: html, easy: html, translate: html } — 이 페이지를 보는 동안만 유지
   const prefetching = {}; // { simple: Promise, ... } — 진행 중인 변환 요청 중복 방지
 
@@ -308,8 +310,7 @@
     setKnob(targetIndex);
 
     // 드래그 중 이미 해당 단계 내용이 표시된 상태면, 투명도만 다시 올리면 끝
-    // 단, 번역본이 표시 중이었다면(displayedIndex는 -1) 반드시 슬라이더 단계 내용으로 되돌려야 하므로 건너뛴다.
-    if (targetIndex === displayedIndex && !translateOn) {
+    if (targetIndex === displayedIndex) {
       appliedLevel = targetIndex;
       fadeOpacityTo(1);
       return;
@@ -326,7 +327,8 @@
       await fadeOpacityTo(0);
       container.innerHTML = html;
       displayedIndex = targetIndex;
-      setTranslateState(false); // 슬라이더로 전환했으니 번역 버튼 상태도 원위치
+      // 번역 버튼의 표시 상태(텍스트/활성 스타일)는 슬라이더 조작만으로는 바꾸지 않는다.
+      // "원문 보기"를 직접 눌러야만 되돌아가도록 유지.
       await fadeOpacityTo(1);
       appliedLevel = targetIndex;
     } catch (err) {
@@ -382,8 +384,8 @@
     highlightLevel(near);
 
     // 중간 지점을 넘어 다른 단계 구역에 들어가면, 준비된 내용이 있을 때 본문을 바로 교체
+    // (번역 버튼의 표시 상태는 여기서 건드리지 않는다 — "원문 보기"를 직접 눌러야만 바뀐다)
     if (near !== displayedIndex) {
-      setTranslateState(false); // 슬라이더를 만졌으니 번역 표시 상태는 해제
       const html = contentForLevel(near);
       if (html) {
         container.innerHTML = html;
