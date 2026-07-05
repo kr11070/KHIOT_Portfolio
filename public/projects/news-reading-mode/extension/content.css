@@ -120,20 +120,20 @@
   transition: none !important;
 }
 
-/* 변환본 하단에 붙는 원문 이미지 영역 */
-.nrm-images {
-  margin-top: 24px;
+/* 변환본 문단 사이에 원래 위치대로 끼워지는 원문 이미지 */
+.nrm-image {
+  margin: 20px 0;
 }
 
-.nrm-images img {
+.nrm-image img {
   max-width: 100%;
   height: auto;
   display: block;
-  margin: 16px auto;
+  margin: 12px auto;
 }
 
-.nrm-images figure {
-  margin: 16px 0;
+.nrm-image figure {
+  margin: 12px 0;
 }
 
 #nrm-toast {

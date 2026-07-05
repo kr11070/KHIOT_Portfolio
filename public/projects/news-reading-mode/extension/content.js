@@ -32,8 +32,23 @@
   const originalHtml = container.innerHTML;
   const originalText = container.innerText.trim().slice(0, 6000);
 
-  // 원문에 있던 이미지(figure/img)를 추출해서 변환본에도 그대로 붙여준다.
-  function extractImagesHtml(html) {
+  // 대상 요소보다 앞(문서 순서상)에 나오는 텍스트의 총 길이. 요소 내부(캡션 등)는 제외.
+  function textLengthBefore(rootEl, targetEl) {
+    let len = 0;
+    const walker = document.createTreeWalker(rootEl, NodeFilter.SHOW_TEXT);
+    let node;
+    while ((node = walker.nextNode())) {
+      const pos = targetEl.compareDocumentPosition(node);
+      if (pos & Node.DOCUMENT_POSITION_PRECEDING && !(pos & Node.DOCUMENT_POSITION_CONTAINED_BY)) {
+        len += node.textContent.length;
+      }
+    }
+    return len;
+  }
+
+  // 원문에 있던 이미지(figure/img)를 "원문 내 상대 위치(0~1)"와 함께 추출한다.
+  // 변환본에서도 같은 비율 지점의 문단 사이에 끼워 넣어 원래 위치를 유지하기 위함.
+  function extractImageItems(html) {
     const tmp = document.createElement('div');
     tmp.innerHTML = html;
     // 지연 로딩(lazy-load) 이미지는 src가 비어 있을 수 있어 data-* 속성에서 복원
@@ -46,8 +61,9 @@
         if (lazy) img.setAttribute('src', lazy);
       }
     });
+    const totalTextLen = (tmp.textContent || '').length || 1;
     const seen = new Set();
-    const parts = [];
+    const items = [];
     tmp.querySelectorAll('figure, img').forEach((el) => {
       if (el.tagName === 'IMG') {
         if (el.closest('figure')) return; // figure 안의 img는 figure 쪽에서 한 번만 수집
@@ -58,12 +74,15 @@
       const src = img.getAttribute('src');
       if (!src || seen.has(src)) return;
       seen.add(src);
-      parts.push(el.outerHTML);
+      items.push({
+        html: el.outerHTML,
+        ratio: textLengthBefore(tmp, el) / totalTextLen,
+      });
     });
-    return parts.join('');
+    return items;
   }
 
-  const imagesHtml = extractImagesHtml(originalHtml);
+  const imageItems = extractImageItems(originalHtml);
 
   // Agile Squad 프로토타입과 동일한 3단계: 원문(0) / 쉬운말(1) / 쉽게읽기(2)
   const LEVELS = ['original', 'simple', 'easy'];
@@ -117,9 +136,9 @@
     setTimeout(() => toast.remove(), 4000);
   }
 
-  // v2: 변환본에 원문 이미지가 포함되도록 형식이 바뀌어 이전 캐시와 구분
+  // v3: 이미지가 본문 하단 모음이 아니라 원문 내 위치 비율대로 삽입되는 형식
   function storageKey(level) {
-    return `nrm-cache:v2:${location.href}:${level}`;
+    return `nrm-cache:v3:${location.href}:${level}`;
   }
 
   function loadFromStorage(level) {
@@ -135,13 +154,30 @@
   }
 
   function textToHtml(text) {
-    const paragraphs = text
+    const lines = text
       .split('\n')
       .filter((line) => line.trim().length > 0)
-      .map((line) => `<p>${line.trim()}</p>`)
-      .join('');
-    // 원문에 이미지가 있었다면 변환된 본문 아래에 그대로 이어 붙인다
-    return paragraphs + (imagesHtml ? '<div class="nrm-images">' + imagesHtml + '</div>' : '');
+      .map((line) => `<p>${line.trim()}</p>`);
+    if (!imageItems.length) return lines.join('');
+
+    // 각 이미지를 원문에서의 상대 위치(ratio)에 해당하는 문단 사이에 삽입한다.
+    // 예: 원문 40% 지점에 있던 사진은 변환본에서도 문단 수 기준 40% 지점에 들어간다.
+    const n = lines.length;
+    const inserts = new Map(); // "lines[idx] 바로 앞" 위치 → 삽입할 이미지 HTML 목록
+    imageItems.forEach((item) => {
+      const idx = Math.max(0, Math.min(n, Math.round(item.ratio * n)));
+      if (!inserts.has(idx)) inserts.set(idx, []);
+      inserts.get(idx).push(item.html);
+    });
+
+    const result = [];
+    for (let i = 0; i <= n; i++) {
+      if (inserts.has(i)) {
+        result.push('<div class="nrm-image">' + inserts.get(i).join('') + '</div>');
+      }
+      if (i < n) result.push(lines[i]);
+    }
+    return result.join('');
   }
 
   function requestSimplifiedText(rawText, level) {
