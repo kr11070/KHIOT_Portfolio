@@ -86,6 +86,36 @@ function fixJapaneseLeakage(text) {
     .replace(/[ \t]{2,}/g, ' ');
 }
 
+// 가나 + CJK 한자 잔여 여부 검사용. 위의 고정 패턴 치환으로 못 잡는
+// 임의의 한자(예: 響, 課題)가 남아 있으면 2차 정리 요청으로 마저 정리한다.
+const JAPANESE_RESIDUE = /[぀-ヿ㐀-䶵一-鿋]/;
+
+const CLEANUP_PROMPT =
+  '다음 텍스트는 일본어 기사를 한국어로 번역한 것인데, 일본어 한자나 가나가 일부 그대로 남아 있어. ' +
+  '남아 있는 일본어 문자를 모두 문맥에 맞는 자연스러운 한국어 단어로 바꿔서 전체 텍스트를 다시 써줘. ' +
+  '이미 한국어인 부분은 절대 바꾸지 말고, 문단 구성도 그대로 유지하고, 순수 텍스트로만 답해줘.';
+
+async function cleanupResidualJapanese(apiKey, koreanText) {
+  const res = await fetch(GROQ_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      model: MODEL,
+      messages: [
+        { role: 'system', content: CLEANUP_PROMPT },
+        { role: 'user', content: koreanText },
+      ],
+      temperature: 0,
+    }),
+  });
+  if (!res.ok) return koreanText; // 정리 실패 시 1차 번역 결과라도 그대로 반환
+  const data = await res.json();
+  return data.choices?.[0]?.message?.content?.trim() || koreanText;
+}
+
 exports.handler = async (event) => {
   const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
@@ -158,7 +188,13 @@ exports.handler = async (event) => {
       return { statusCode: 502, headers: corsHeaders, body: JSON.stringify({ error: 'Groq 응답에서 텍스트를 찾지 못했습니다.' }) };
     }
 
-    if (level === 'translate') simplifiedText = fixJapaneseLeakage(simplifiedText);
+    if (level === 'translate') {
+      simplifiedText = fixJapaneseLeakage(simplifiedText);
+      // 고정 패턴으로 못 잡은 임의의 한자/가나가 남아 있으면 모델에게 2차 정리를 맡긴다
+      if (JAPANESE_RESIDUE.test(simplifiedText)) {
+        simplifiedText = fixJapaneseLeakage(await cleanupResidualJapanese(apiKey, simplifiedText));
+      }
+    }
 
     return {
       statusCode: 200,

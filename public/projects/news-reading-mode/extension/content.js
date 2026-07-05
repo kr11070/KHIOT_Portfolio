@@ -197,10 +197,10 @@
     setTimeout(() => toast.remove(), 4000);
   }
 
-  // v6: 외국어 기사의 쉬운말/쉬운말이 원문 언어를 유지하도록 바뀜 — 한국어로 잘못
-  // 변환돼 저장된 이전 캐시(v5 이하)를 무효화하기 위해 버전을 올림
+  // v7: 번역 결과의 일본어 한자/가나 잔여물을 서버가 2차 정리하도록 바뀜 — 한자가
+  // 섞인 채 저장된 이전 번역 캐시를 무효화하기 위해 버전을 올림
   function storageKey(level) {
-    return `nrm-cache:v6:${location.href}:${level}`;
+    return `nrm-cache:v7:${location.href}:${level}`;
   }
 
   function loadFromStorage(level) {
