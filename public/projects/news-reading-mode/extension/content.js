@@ -32,6 +32,37 @@
   const originalHtml = container.innerHTML;
   const originalText = container.innerText.trim().slice(0, 6000);
 
+  // 지연 로딩(lazy-load) 이미지는 진짜 사진이 로드되기 전까지 src에 흐린 플레이스홀더나
+  // 투명 픽셀을 넣어두는 경우가 많다. data-* 속성에 진짜 주소가 있으면 항상 그걸 우선한다.
+  function fixLazyImages(rootEl) {
+    rootEl.querySelectorAll('img').forEach((img) => {
+      const lazySrc =
+        img.getAttribute('data-src') ||
+        img.getAttribute('data-lazy-src') ||
+        img.getAttribute('data-original') ||
+        img.getAttribute('data-original-src');
+      if (lazySrc) img.setAttribute('src', lazySrc);
+
+      const lazySrcset = img.getAttribute('data-srcset');
+      if (lazySrcset) img.setAttribute('srcset', lazySrcset);
+
+      // "loading=lazy"가 남아있으면 브라우저가 뷰포트 근처까지 또 로드를 미룰 수 있어 제거
+      img.removeAttribute('loading');
+    });
+  }
+
+  // 원문 복원용 HTML. 저장 시점에 아직 로드 전(플레이스홀더 src)이던 이미지는,
+  // 그대로 복원하면 사이트의 지연 로딩 스크립트가 새 요소를 추적하지 않아 영영 안 뜬다.
+  // 그래서 복원용 스냅샷에도 미리 실제 이미지 주소를 박아둔다. (노브 이동 후 원문 복귀 시 이미지 유지)
+  function buildRestoredOriginalHtml(html) {
+    const tmp = document.createElement('div');
+    tmp.innerHTML = html;
+    fixLazyImages(tmp);
+    return tmp.innerHTML;
+  }
+
+  const restoredOriginalHtml = buildRestoredOriginalHtml(originalHtml);
+
   // 대상 요소보다 앞(문서 순서상)에 나오는 텍스트의 총 길이. 요소 내부(캡션 등)는 제외.
   function textLengthBefore(rootEl, targetEl) {
     let len = 0;
@@ -51,23 +82,7 @@
   function extractImageItems(html) {
     const tmp = document.createElement('div');
     tmp.innerHTML = html;
-    // 지연 로딩(lazy-load) 이미지는 진짜 사진이 로드되기 전까지 src에 흐린 플레이스홀더나
-    // 투명 픽셀을 넣어두는 경우가 많다. src가 비어 있을 때뿐 아니라, data-* 속성에
-    // 진짜 주소가 있으면 항상 그걸 우선해서 플레이스홀더를 덮어써야 한다.
-    tmp.querySelectorAll('img').forEach((img) => {
-      const lazySrc =
-        img.getAttribute('data-src') ||
-        img.getAttribute('data-lazy-src') ||
-        img.getAttribute('data-original') ||
-        img.getAttribute('data-original-src');
-      if (lazySrc) img.setAttribute('src', lazySrc);
-
-      const lazySrcset = img.getAttribute('data-srcset');
-      if (lazySrcset) img.setAttribute('srcset', lazySrcset);
-
-      // "loading=lazy"가 남아있으면 브라우저가 뷰포트 근처까지 또 로드를 미룰 수 있어 제거
-      img.removeAttribute('loading');
-    });
+    fixLazyImages(tmp);
     const totalTextLen = (tmp.textContent || '').length || 1;
     const seen = new Set();
     const items = [];
@@ -108,19 +123,27 @@
 
   const foreignLang = detectForeignLanguage(originalText);
 
-  // Agile Squad 프로토타입과 동일한 3단계: 원문(0) / 쉬운말(1) / 쉬운말(2)
-  const LEVELS = ['original', 'simple', 'easy'];
+  // Agile Squad 프로토타입과 동일한 3단계 슬라이더.
+  // 번역이 꺼진 상태: 원문(원어) / 쉬운말(원어) / 쉬운말(원어)
+  // 번역이 켜진 상태: 한국어 번역본 / 쉬운말(한국어) / 쉬운말(한국어)
   const LEVEL_TOPS = [15, 50, 85]; // 트랙 안에서 각 단계의 점/노브 위치(%)
   const HALF_GAP = (LEVEL_TOPS[1] - LEVEL_TOPS[0]) / 2; // 인접 단계 중간 지점까지의 거리
 
-  let appliedLevel = 0; // 마지막으로 확정된 단계
-  let displayedIndex = 0; // 지금 본문에 실제로 표시 중인 단계 (드래그 중엔 확정 전에도 바뀜; 번역 표시 중엔 -1)
+  let appliedLevel = 0; // 마지막으로 확정된 슬라이더 단계 (0/1/2)
+  let displayedKey = 'original'; // 지금 본문에 실제로 표시 중인 콘텐츠 키
   let busy = false; // 확정 후 변환/페이드가 끝날 때까지 true
-  // 번역 버튼 자체의 on/off 표시 상태. 슬라이더를 움직여 실제 본문이 바뀌어도
-  // 이 값과 버튼 글자는 그대로 유지되고, "번역 끄기"를 직접 눌러야만 꺼진다.
+  // 번역 버튼 자체의 on/off 표시 상태. "번역 끄기"를 직접 눌러야만 꺼진다.
   let translateOn = false;
-  const memoryCache = {}; // { simple: html, easy: html, translate: html } — 이 페이지를 보는 동안만 유지
-  const prefetching = {}; // { simple: Promise, ... } — 진행 중인 변환 요청 중복 방지
+  const memoryCache = {}; // { simple, easy, translate, 'simple-ko', 'easy-ko' } — 이 페이지를 보는 동안만 유지
+  const prefetching = {}; // 진행 중인 변환 요청 중복 방지
+
+  // 슬라이더 단계 → 콘텐츠 키. 번역이 켜져 있으면 같은 단계라도 한국어 계열 키를 쓴다.
+  function keyForLevel(levelIndex) {
+    if (translateOn) {
+      return levelIndex === 0 ? 'translate' : levelIndex === 1 ? 'simple-ko' : 'easy-ko';
+    }
+    return levelIndex === 0 ? 'original' : levelIndex === 1 ? 'simple' : 'easy';
+  }
 
   // ── 세로 슬라이더 UI (프로토타입의 rlv 구조 이식) ──
   // #nrm-panel(화면에 고정되는 바깥 껍데기) 안에 슬라이더 카드와, 필요하면 번역 버튼을 세로로 쌓는다.
@@ -197,22 +220,21 @@
     setTimeout(() => toast.remove(), 4000);
   }
 
-  // v7: 번역 결과의 일본어 한자/가나 잔여물을 서버가 2차 정리하도록 바뀜 — 한자가
-  // 섞인 채 저장된 이전 번역 캐시를 무효화하기 위해 버전을 올림
-  function storageKey(level) {
-    return `nrm-cache:v7:${location.href}:${level}`;
+  // v8: 번역 상태에서 슬라이더가 한국어 기준(simple-ko/easy-ko)으로 동작하는 구조로 개편
+  function storageKey(key) {
+    return `nrm-cache:v8:${location.href}:${key}`;
   }
 
-  function loadFromStorage(level) {
+  function loadFromStorage(key) {
     return new Promise((resolve) => {
-      chrome.storage.local.get(storageKey(level), (result) => {
-        resolve(result[storageKey(level)] || null);
+      chrome.storage.local.get(storageKey(key), (result) => {
+        resolve(result[storageKey(key)] || null);
       });
     });
   }
 
-  function saveToStorage(level, html) {
-    chrome.storage.local.set({ [storageKey(level)]: html });
+  function saveToStorage(key, html) {
+    chrome.storage.local.set({ [storageKey(key)]: html });
   }
 
   // 원문 사이트 고유 스타일은 건드리지 않도록, 변환된 본문에만 프로토타입 스타일 래퍼(.nrm-converted)를 씌운다.
@@ -249,11 +271,16 @@
     return '<div class="nrm-converted">' + body + '</div>';
   }
 
-  function requestSimplifiedText(rawText, level) {
+  // 변환본 HTML에서 순수 텍스트만 추출 (한국어 번역본을 다시 쉬운말로 바꿀 때 입력으로 사용)
+  function htmlToText(html) {
+    const tmp = document.createElement('div');
+    tmp.innerHTML = html;
+    return tmp.innerText.trim().slice(0, 6000);
+  }
+
+  function requestSimplifiedText(rawText, level, lang) {
     return new Promise((resolve, reject) => {
-      // foreignLang(원문이 감지된 언어)을 같이 보내서, 서버가 "쉬운말/쉬운말" 응답을
-      // 원문과 같은 언어로 확실히 고정할 수 있게 한다. translate 요청에는 영향 없음.
-      chrome.runtime.sendMessage({ type: 'NRM_SIMPLIFY', text: rawText, level, lang: foreignLang }, (response) => {
+      chrome.runtime.sendMessage({ type: 'NRM_SIMPLIFY', text: rawText, level, lang }, (response) => {
         if (chrome.runtime.lastError) {
           reject(new Error(chrome.runtime.lastError.message));
           return;
@@ -267,30 +294,51 @@
     });
   }
 
-  // 이미 캐시된 내용이 있으면 동기적으로 반환 (원문 포함). 없으면 null.
-  function contentForLevel(levelIndex) {
-    if (levelIndex === 0) return originalHtml;
-    return memoryCache[LEVELS[levelIndex]] || null;
+  // 이미 준비된(동기적으로 보여줄 수 있는) HTML. 없으면 null.
+  function cachedHtmlForKey(key) {
+    if (key === 'original') return restoredOriginalHtml;
+    return memoryCache[key] || null;
   }
 
-  // 해당 단계의 변환 결과를 확보 (storage 캐시 → 없으면 AI 요청). 중복 요청은 하나로 합쳐짐.
-  function ensureContent(level) {
-    if (memoryCache[level]) return Promise.resolve(memoryCache[level]);
-    if (prefetching[level]) return prefetching[level];
+  // 각 콘텐츠 키를 만들기 위한 요청 사양.
+  // simple/easy: 원문 텍스트를 원문 언어 그대로 쉬운 문장으로.
+  // translate: 원문 텍스트를 한국어로 번역.
+  // simple-ko/easy-ko: "번역된 한국어 본문"을 다시 쉬운 한국어로 (번역 상태에서 노브 이동 시).
+  async function requestSpecForKey(key) {
+    if (key === 'simple') return { text: originalText, level: 'simple', lang: foreignLang };
+    if (key === 'easy') return { text: originalText, level: 'easy', lang: foreignLang };
+    if (key === 'translate') return { text: originalText, level: 'translate', lang: foreignLang };
+    if (key === 'simple-ko' || key === 'easy-ko') {
+      const translatedHtml = await ensureKey('translate'); // 번역본이 먼저 필요
+      return {
+        text: htmlToText(translatedHtml),
+        level: key === 'simple-ko' ? 'simple' : 'easy',
+        lang: null, // 한국어 프롬프트 사용
+      };
+    }
+    throw new Error('알 수 없는 콘텐츠 키: ' + key);
+  }
+
+  // 해당 키의 변환 결과를 확보 (storage 캐시 → 없으면 AI 요청). 중복 요청은 하나로 합쳐짐.
+  function ensureKey(key) {
+    if (key === 'original') return Promise.resolve(restoredOriginalHtml);
+    if (memoryCache[key]) return Promise.resolve(memoryCache[key]);
+    if (prefetching[key]) return prefetching[key];
     const p = (async () => {
-      let html = await loadFromStorage(level);
+      let html = await loadFromStorage(key);
       if (!html) {
-        const simplifiedText = await requestSimplifiedText(originalText, level);
-        html = textToHtml(simplifiedText);
-        saveToStorage(level, html);
+        const spec = await requestSpecForKey(key);
+        const convertedText = await requestSimplifiedText(spec.text, spec.level, spec.lang);
+        html = textToHtml(convertedText);
+        saveToStorage(key, html);
       }
-      memoryCache[level] = html;
+      memoryCache[key] = html;
       return html;
     })();
-    prefetching[level] = p;
+    prefetching[key] = p;
     p.then(
-      () => { delete prefetching[level]; },
-      () => { delete prefetching[level]; } // 실패 시 다음에 재시도할 수 있게 비워둔다
+      () => { delete prefetching[key]; },
+      () => { delete prefetching[key]; } // 실패 시 다음에 재시도할 수 있게 비워둔다
     );
     return p;
   }
@@ -312,38 +360,36 @@
     if (busy) return;
     setKnob(targetIndex);
 
-    // 드래그 중 이미 해당 단계 내용이 표시된 상태면, 투명도만 다시 올리면 끝
-    if (targetIndex === displayedIndex) {
+    const key = keyForLevel(targetIndex);
+
+    // 드래그 중 이미 해당 내용이 표시된 상태면, 투명도만 다시 올리면 끝
+    if (key === displayedKey) {
       appliedLevel = targetIndex;
       fadeOpacityTo(1);
       return;
     }
 
     busy = true;
-    const level = LEVELS[targetIndex];
-    const needsFetch = !contentForLevel(targetIndex);
+    const needsFetch = !cachedHtmlForKey(key);
     if (needsFetch) knob.classList.add('loading');
 
     try {
-      const html = targetIndex === 0 ? originalHtml : await ensureContent(level);
+      const html = await ensureKey(key);
       knob.classList.remove('loading');
       await fadeOpacityTo(0);
       container.innerHTML = html;
-      displayedIndex = targetIndex;
-      // 번역 버튼의 표시 상태(텍스트/활성 스타일)는 슬라이더 조작만으로는 바꾸지 않는다.
-      // "번역 끄기"를 직접 눌러야만 되돌아가도록 유지.
+      displayedKey = key;
       await fadeOpacityTo(1);
       appliedLevel = targetIndex;
     } catch (err) {
       knob.classList.remove('loading');
       setKnob(appliedLevel);
-      // 드래그 중 다른 단계 내용이 표시돼 있었다면 확정 단계의 내용으로 되돌린다
-      if (displayedIndex !== appliedLevel) {
-        const fallback = contentForLevel(appliedLevel);
-        if (fallback) {
-          container.innerHTML = fallback;
-          displayedIndex = appliedLevel;
-        }
+      // 드래그 중 다른 내용이 표시돼 있었다면 확정 단계의 내용으로 되돌린다
+      const fallbackKey = keyForLevel(appliedLevel);
+      const fallback = cachedHtmlForKey(fallbackKey);
+      if (fallback && displayedKey !== fallbackKey) {
+        container.innerHTML = fallback;
+        displayedKey = fallbackKey;
       }
       fadeOpacityTo(1);
       showToast('변환에 실패했어요: ' + err.message);
@@ -388,18 +434,19 @@
 
     // 중간 지점을 넘어 다른 단계 구역에 들어가면, 준비된 내용이 있을 때 본문을 바로 교체
     // (번역 버튼의 표시 상태는 여기서 건드리지 않는다 — "번역 끄기"를 직접 눌러야만 바뀐다)
-    if (near !== displayedIndex) {
-      const html = contentForLevel(near);
+    const key = keyForLevel(near);
+    if (key !== displayedKey) {
+      const html = cachedHtmlForKey(key);
       if (html) {
         container.innerHTML = html;
-        displayedIndex = near;
+        displayedKey = key;
       } else {
         // 아직 변환 안 된 단계면 드래그 중에 미리 요청을 시작해둔다 (놓을 때쯤 준비되도록)
-        ensureContent(LEVELS[near])
+        ensureKey(key)
           .then((h) => {
-            if (dragging && nearestLevel(lastTopPercent) === near && displayedIndex !== near) {
+            if (dragging && keyForLevel(nearestLevel(lastTopPercent)) === key && displayedKey !== key) {
               container.innerHTML = h;
-              displayedIndex = near;
+              displayedKey = key;
             }
           })
           .catch(() => {}); // 드래그 중 프리페치 실패는 조용히 넘기고, 놓을 때 다시 시도
@@ -416,7 +463,7 @@
     if (busy) return;
     e.preventDefault();
     dragging = true;
-    knob.classList.add('dragging'); // top 트랜지션 끄기 → 포인터에 1:1로 붙어서 움직임
+    knob.classList.add('dragging'); // transform 트랜지션 끄기 → 포인터에 1:1로 붙어서 움직임
     container.classList.add('nrm-fade', 'nrm-fade-drag'); // 투명도도 트랜지션 없이 즉각 반응
     onDragMove(topPercentFromEvent(e));
   });
@@ -438,21 +485,19 @@
 
   labels.forEach((l) => l.addEventListener('click', () => commitLevel(Number(l.dataset.level))));
 
-  // ── 번역 버튼: 슬라이더 단계와 별개로, 원문/번역본을 토글 ──
+  // ── 번역 버튼: 켜면 슬라이더 전체가 "한국어 기준"으로 동작 ──
   if (translateBtn) {
     translateBtn.addEventListener('click', async () => {
       if (busy) return;
 
       if (translateOn) {
-        // 끄기: 항상 번역되지 않은 진짜 원문으로 돌아간다. 슬라이더도 "원문" 위치로 리셋.
-        // (슬라이더가 쉬운말/쉬운말에 가 있었다면 그 결과는 AI가 항상 한국어로 출력하므로,
-        //  그 상태로 되돌리면 여전히 한국어라 "안 꺼진 것처럼" 보이는 문제가 있었다.)
+        // 끄기: 항상 번역되지 않은 진짜 원문으로 돌아가고, 슬라이더도 "원문" 위치로 리셋
         busy = true;
         setTranslateState(false);
         try {
           await fadeOpacityTo(0);
-          container.innerHTML = originalHtml;
-          displayedIndex = 0;
+          container.innerHTML = restoredOriginalHtml;
+          displayedKey = 'original';
           appliedLevel = 0;
           setKnob(0);
           await fadeOpacityTo(1);
@@ -470,11 +515,15 @@
       }
 
       try {
-        const html = await ensureContent('translate');
+        const html = await ensureKey('translate');
         translateBtn.classList.remove('loading');
         await fadeOpacityTo(0);
         container.innerHTML = html;
-        displayedIndex = -1; // 슬라이더의 세 단계 어디에도 속하지 않는 상태
+        displayedKey = 'translate';
+        // 번역을 켜면 슬라이더는 "원문" 위치 = 한국어 번역본이 기준이 된다.
+        // 이후 노브를 움직이면 번역본을 다시 쉬운 한국어로 바꿔서 보여준다.
+        appliedLevel = 0;
+        setKnob(0);
         setTranslateState(true);
         await fadeOpacityTo(1);
       } catch (err) {
