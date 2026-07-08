@@ -1,3 +1,64 @@
+/* 한글: Pretendard, 일문: Noto Sans JP, 영문 세리프 악센트: Noto Serif */
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css");
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif:ital,wght@0,400;1,400;1,600&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-cream text-ink antialiased;
+}
+
+/* ── 스크롤 리빌 (Reveal 컴포넌트가 클래스를 토글) ── */
+.reveal-init {
+  opacity: 0;
+  transform: translateY(18px);
+}
+
+.reveal-in {
+  opacity: 1;
+  transform: none;
+  transition: opacity 0.65s ease, transform 0.65s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal-init {
+    opacity: 1;
+    transform: none;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* ── 글래스모피즘 (네비게이션 바 등) ── */
+.glass {
+  background: rgba(250, 248, 242, 0.78);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+/* ── 히어로 배경의 은은한 블롭 ── */
+@keyframes blob-drift {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(24px, -18px) scale(1.06);
+  }
+}
+
+.hero-blob {
+  animation: blob-drift 14s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-blob {
+    animation: none;
+  }
+}

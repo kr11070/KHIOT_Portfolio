@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
+import { LanguageProvider } from "@/lib/i18n";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "KHIOT Portfolio",
-  description: "UX/UI Design & Product Management Portfolio",
+  title: "Lee Juhee — UI/UX Designer",
+  description: "UI/UX Designer Lee Juhee's portfolio — projects, case studies, and side projects.",
 };
 
 export default function RootLayout({
@@ -13,8 +14,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko">
-      <body className="min-h-screen bg-white text-neutral-900">
-        {children}
+      <body className="min-h-screen">
+        <LanguageProvider>{children}</LanguageProvider>
       </body>
     </html>
   );
