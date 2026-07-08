@@ -29,11 +29,11 @@ export default function Hero() {
       </p>
 
       <div className="relative mx-auto flex min-h-screen max-w-5xl flex-col justify-center px-5 pb-24 pt-28">
-        {/* 작게 기울인 배지 — 대담한 타이포와 균형을 잡아주는 디테일 */}
+        {/* 배지 — 대담한 타이포와 균형을 잡아주는 디테일 */}
         <Reveal>
-          <span className="inline-flex w-fit -rotate-2 items-center gap-2 rounded-full border border-line bg-white/70 px-3.5 py-1.5 text-xs font-bold tracking-wide text-accent-deep">
-            <span className="h-1.5 w-1.5 rounded-full bg-accent" />
-            2026 PORTFOLIO
+          <span className="inline-flex w-fit items-center gap-2 rounded-full border border-line bg-white/70 px-3.5 py-1.5 text-xs font-bold leading-none tracking-wide text-accent-deep">
+            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
+            <span>2026 PORTFOLIO</span>
           </span>
         </Reveal>
 
@@ -59,13 +59,13 @@ export default function Hero() {
           <div className="mt-10 flex flex-wrap gap-3">
             <a
               href="#projects"
-              className="rounded-full bg-ink px-6 py-3 text-sm font-bold text-cream transition-transform hover:-translate-y-0.5"
+              className="btn-glossy rounded-full px-6 py-3 text-sm font-bold text-accent-deep hover:-translate-y-0.5"
             >
               {pick(dict.hero.viewProjects, lang)}
             </a>
             <a
               href="#contact"
-              className="rounded-full border border-line bg-white/70 px-6 py-3 text-sm font-bold text-ink transition-all hover:-translate-y-0.5 hover:border-accent-dark"
+              className="rounded-full bg-ink px-6 py-3 text-sm font-bold text-cream transition-all hover:-translate-y-0.5"
             >
               {pick(dict.hero.contactMe, lang)}
             </a>

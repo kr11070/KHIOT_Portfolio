@@ -3,8 +3,8 @@ import { LanguageProvider } from "@/lib/i18n";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Lee Juhee — UI/UX Designer",
-  description: "UI/UX Designer Lee Juhee's portfolio — projects, case studies, and side projects.",
+  title: "Lee Juhee — Product Designer",
+  description: "Product Designer Lee Juhee's portfolio — projects, case studies, and side projects.",
 };
 
 export default function RootLayout({

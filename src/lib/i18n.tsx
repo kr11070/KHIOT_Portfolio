@@ -19,7 +19,7 @@ export const dict = {
   hero: {
     greeting: { ko: "안녕하세요,", en: "Hello, I'm", ja: "こんにちは、" },
     name: { ko: "이주희입니다", en: "Lee Juhee", ja: "イ・ジュヒです" },
-    role: { ko: "UI/UX 디자이너", en: "UI/UX Designer", ja: "UI/UXデザイナー" },
+    role: { ko: "Product Designer", en: "Product Designer", ja: "Product Designer" },
     tagline: {
       ko: "사용자의 이야기에서 출발해, 누구나 읽기 쉬운 경험을 설계합니다.",
       en: "Designing approachable experiences that begin with users' stories.",
