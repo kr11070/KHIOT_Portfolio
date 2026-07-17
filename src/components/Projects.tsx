@@ -1,7 +1,8 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { dict, pick, useLang } from "@/lib/i18n";
-import { mainProjects, sideProjects } from "@/lib/portfolio-data";
+import { fallbackSideProjects, getSideProjects, mainProjects, type Project } from "@/lib/portfolio-data";
 import ProjectCard from "./ProjectCard";
 import Reveal from "./Reveal";
 
@@ -31,6 +32,17 @@ export function Projects() {
 
 export function SideProjects() {
   const { lang } = useLang();
+  const [sideProjects, setSideProjects] = useState<Project[]>(fallbackSideProjects);
+
+  useEffect(() => {
+    let cancelled = false;
+    getSideProjects().then((projects) => {
+      if (!cancelled) setSideProjects(projects);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   return (
     <section id="side-projects" className="mx-auto max-w-5xl scroll-mt-20 px-5 py-24">

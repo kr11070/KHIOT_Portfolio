@@ -1,4 +1,5 @@
 import type { Lang } from "./i18n";
+import { supabase } from "./supabase";
 
 export type LocalizedText = Record<Lang, string>;
 
@@ -15,6 +16,56 @@ export type Project = {
     github?: string;
   };
 };
+
+/** Supabase `side_projects` 테이블의 row 형태 */
+type SideProjectRow = {
+  slug: string;
+  title_ko: string;
+  title_en: string;
+  title_ja: string;
+  description_ko: string;
+  description_en: string;
+  description_ja: string;
+  tech: string[];
+  thumbnail: string | null;
+  link_case_study: string | null;
+  link_demo: string | null;
+  link_github: string | null;
+};
+
+function mapSideProjectRow(row: SideProjectRow): Project {
+  return {
+    slug: row.slug,
+    title: { ko: row.title_ko, en: row.title_en, ja: row.title_ja },
+    description: { ko: row.description_ko, en: row.description_en, ja: row.description_ja },
+    tech: row.tech,
+    thumbnail: row.thumbnail ?? undefined,
+    links: {
+      caseStudy: row.link_case_study ?? undefined,
+      demo: row.link_demo ?? undefined,
+      github: row.link_github ?? undefined,
+    },
+  };
+}
+
+/**
+ * 사이드 프로젝트 목록을 Supabase `side_projects` 테이블에서 가져옵니다.
+ * Supabase가 설정되지 않았거나 조회에 실패하면 아래 fallbackSideProjects로 대체합니다.
+ */
+export async function getSideProjects(): Promise<Project[]> {
+  if (!supabase) return fallbackSideProjects;
+
+  const { data, error } = await supabase
+    .from("side_projects")
+    .select(
+      "slug, title_ko, title_en, title_ja, description_ko, description_en, description_ja, tech, thumbnail, link_case_study, link_demo, link_github"
+    )
+    .order("sort_order", { ascending: true });
+
+  if (error || !data || data.length === 0) return fallbackSideProjects;
+
+  return data.map(mapSideProjectRow);
+}
 
 /**
  * ── 프로젝트 카드 추가 방법 ──
@@ -60,7 +111,8 @@ export const mainProjects: Project[] = [
   },
 ];
 
-export const sideProjects: Project[] = [
+/** Supabase 조회 실패 시 대체로 쓰이는 정적 목록 (side_projects 테이블 초기 시드와 내용을 맞춰주세요) */
+export const fallbackSideProjects: Project[] = [
   {
     slug: "news-reading-mode",
     title: {
@@ -77,6 +129,23 @@ export const sideProjects: Project[] = [
     links: {
       demo: "/projects/news-reading-mode/index.html",
       github: "https://github.com/kr11070/KHIOT_Portfolio/tree/main/public/projects/news-reading-mode",
+    },
+  },
+  {
+    slug: "clothing-app-ux-research",
+    title: {
+      ko: "의류 쇼핑 앱 UX 리서치",
+      en: "Clothing Shopping App UX Research",
+      ja: "衣類ショッピングアプリ UXリサーチ",
+    },
+    description: {
+      ko: "사용자 인터뷰 1건을 진행해 사이즈 정보 부정확, 색상 왜곡, 리뷰 신뢰도 부족 등 8개의 페인포인트를 도출하고 해결 우선순위를 정리한 UX 리서치 리포트입니다.",
+      en: "A UX research report built from a single user interview, surfacing 8 pain points — inaccurate size info, color distortion, low review trust, and more — with prioritized solutions.",
+      ja: "ユーザーインタビュー1件から、サイズ情報の不正確さや色の歪み、レビューの信頼性不足など8つのペインポイントを導き出し、解決の優先順位を整理したUXリサーチレポートです。",
+    },
+    tech: ["UX Research", "User Interview", "Claude"],
+    links: {
+      demo: "https://claude.ai/public/artifacts/72008362-d10e-471e-92b3-80b040bba396",
     },
   },
 ];
