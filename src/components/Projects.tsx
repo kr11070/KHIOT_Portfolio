@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { dict, pick, useLang } from "@/lib/i18n";
 import { fallbackSideProjects, getSideProjects, mainProjects, type Project } from "@/lib/portfolio-data";
+import AddProjectCard from "./AddProjectCard";
 import ProjectCard from "./ProjectCard";
 import Reveal from "./Reveal";
 
@@ -34,6 +35,10 @@ export function SideProjects() {
   const { lang } = useLang();
   const [sideProjects, setSideProjects] = useState<Project[]>(fallbackSideProjects);
 
+  const reload = useCallback(() => {
+    getSideProjects().then(setSideProjects);
+  }, []);
+
   useEffect(() => {
     let cancelled = false;
     getSideProjects().then((projects) => {
@@ -60,6 +65,9 @@ export function SideProjects() {
             <ProjectCard project={project} compact />
           </Reveal>
         ))}
+        <Reveal delay={sideProjects.length * 100} className="h-full">
+          <AddProjectCard onAdded={reload} />
+        </Reveal>
       </div>
     </section>
   );

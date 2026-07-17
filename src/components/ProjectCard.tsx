@@ -47,6 +47,9 @@ export default function ProjectCard({
       </div>
 
       <div className="flex flex-1 flex-col p-6">
+        {project.date && (
+          <p className="mb-1 text-[11px] font-bold tracking-wide text-ink-soft/70">{project.date}</p>
+        )}
         <h3 className={`font-extrabold tracking-tight ${compact ? "text-lg" : "text-xl"}`}>
           {title}
         </h3>

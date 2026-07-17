@@ -8,6 +8,8 @@ export type Project = {
   title: LocalizedText;
   description: LocalizedText;
   tech: string[];
+  /** 카드에 표시할 날짜 (예: "2026.07"). 없으면 표시되지 않습니다. */
+  date?: string;
   /** public/ 기준 경로 (예: "/images/agile-squad/thumb.png"). 없으면 그라데이션 플레이스홀더가 대신 표시됩니다. */
   thumbnail?: string;
   links: {
@@ -31,14 +33,21 @@ type SideProjectRow = {
   link_case_study: string | null;
   link_demo: string | null;
   link_github: string | null;
+  project_date?: string | null;
 };
 
 function mapSideProjectRow(row: SideProjectRow): Project {
   return {
     slug: row.slug,
-    title: { ko: row.title_ko, en: row.title_en, ja: row.title_ja },
-    description: { ko: row.description_ko, en: row.description_en, ja: row.description_ja },
+    // 폼으로 추가한 카드는 한국어만 있을 수 있으므로 en/ja가 비면 ko로 대체
+    title: { ko: row.title_ko, en: row.title_en || row.title_ko, ja: row.title_ja || row.title_ko },
+    description: {
+      ko: row.description_ko,
+      en: row.description_en || row.description_ko,
+      ja: row.description_ja || row.description_ko,
+    },
     tech: row.tech,
+    date: row.project_date ?? undefined,
     thumbnail: row.thumbnail ?? undefined,
     links: {
       caseStudy: row.link_case_study ?? undefined,
@@ -57,14 +66,63 @@ export async function getSideProjects(): Promise<Project[]> {
 
   const { data, error } = await supabase
     .from("side_projects")
-    .select(
-      "slug, title_ko, title_en, title_ja, description_ko, description_en, description_ja, tech, thumbnail, link_case_study, link_demo, link_github"
-    )
+    .select("*")
     .order("sort_order", { ascending: true });
 
   if (error || !data || data.length === 0) return fallbackSideProjects;
 
-  return data.map(mapSideProjectRow);
+  return (data as SideProjectRow[]).map(mapSideProjectRow);
+}
+
+export type NewSideProject = {
+  title: string;
+  description: string;
+  date?: string;
+  thumbnail?: string;
+  tech: string[];
+  demo?: string;
+  github?: string;
+};
+
+/**
+ * "프로젝트 추가" 폼에서 호출. Supabase의 add_side_project 함수(RPC)로 저장하며,
+ * 비밀번호 검증은 Supabase 쪽에서 이뤄집니다 (supabase/add_project_form.sql 참고).
+ */
+export async function addSideProject(
+  input: NewSideProject,
+  password: string
+): Promise<{ ok: true } | { ok: false; message: string }> {
+  if (!supabase) return { ok: false, message: "Supabase가 설정되지 않았습니다." };
+
+  const base = input.title
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  const slug = `${base || "project"}-${Date.now()}`;
+
+  const { error } = await supabase.rpc("add_side_project", {
+    p_password: password,
+    p_slug: slug,
+    p_title: input.title.trim(),
+    p_description: input.description.trim(),
+    p_date: input.date?.trim() || null,
+    p_thumbnail: input.thumbnail?.trim() || null,
+    p_tech: input.tech,
+    p_demo: input.demo?.trim() || null,
+    p_github: input.github?.trim() || null,
+  });
+
+  if (error) {
+    if (error.message.includes("ADMIN_PASSWORD_MISMATCH"))
+      return { ok: false, message: "비밀번호가 올바르지 않아요." };
+    if (error.code === "PGRST202")
+      return {
+        ok: false,
+        message: "추가 기능이 아직 설정되지 않았어요. supabase/add_project_form.sql을 실행해주세요.",
+      };
+    return { ok: false, message: `저장에 실패했어요: ${error.message}` };
+  }
+  return { ok: true };
 }
 
 /**
@@ -144,8 +202,27 @@ export const fallbackSideProjects: Project[] = [
       ja: "ユーザーインタビュー1件から、サイズ情報の不正確さや色の歪み、レビューの信頼性不足など8つのペインポイントを導き出し、解決の優先順位を整理したUXリサーチレポートです。",
     },
     tech: ["UX Research", "User Interview", "Claude"],
+    date: "2026.04",
     links: {
       demo: "https://claude.ai/public/artifacts/72008362-d10e-471e-92b3-80b040bba396",
+    },
+  },
+  {
+    slug: "secondhand-app-market-analysis",
+    title: {
+      ko: "중고거래 앱 창업 시장 분석",
+      en: "Secondhand App Market Analysis",
+      ja: "中古取引アプリ市場分析",
+    },
+    description: {
+      ko: "당근마켓·중고나라·번개장터의 경쟁사 포지셔닝과 TAM/SAM/SOM 시장 규모, 3년 수익 시나리오까지 정리한 신규 창업 분석 대시보드입니다.",
+      en: "A startup analysis dashboard covering competitor positioning (Danggeun, Joonggonara, Bunjang), TAM/SAM/SOM market sizing, and a 3-year revenue scenario.",
+      ja: "競合ポジショニングとTAM/SAM/SOM市場規模、3年間の収益シナリオまでまとめた新規創業分析ダッシュボードです。",
+    },
+    tech: ["Market Research", "TAM/SAM/SOM", "Claude"],
+    date: "2026.07",
+    links: {
+      demo: "https://claude.ai/public/artifacts/e2540493-822c-4882-b54e-d021aa4d11b8",
     },
   },
 ];
