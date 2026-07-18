@@ -126,6 +126,44 @@ export async function addSideProject(
 }
 
 /**
+ * 카드의 "✏️ 수정" 폼에서 호출. Supabase의 update_side_project 함수(RPC)로 갱신하며,
+ * 비밀번호 검증은 Supabase 쪽에서 이뤄집니다 (supabase/edit_project_form.sql 참고).
+ */
+export async function updateSideProject(
+  slug: string,
+  input: NewSideProject,
+  password: string
+): Promise<{ ok: true } | { ok: false; message: string }> {
+  if (!supabase) return { ok: false, message: "Supabase가 설정되지 않았습니다." };
+
+  const { error } = await supabase.rpc("update_side_project", {
+    p_password: password,
+    p_slug: slug,
+    p_title: input.title.trim(),
+    p_description: input.description.trim(),
+    p_date: input.date?.trim() || null,
+    p_thumbnail: input.thumbnail?.trim() || null,
+    p_tech: input.tech,
+    p_demo: input.demo?.trim() || null,
+    p_github: input.github?.trim() || null,
+  });
+
+  if (error) {
+    if (error.message.includes("ADMIN_PASSWORD_MISMATCH"))
+      return { ok: false, message: "비밀번호가 올바르지 않아요." };
+    if (error.message.includes("PROJECT_NOT_FOUND"))
+      return { ok: false, message: "이 프로젝트를 찾을 수 없어요." };
+    if (error.code === "PGRST202")
+      return {
+        ok: false,
+        message: "수정 기능이 아직 설정되지 않았어요. supabase/edit_project_form.sql을 실행해주세요.",
+      };
+    return { ok: false, message: `저장에 실패했어요: ${error.message}` };
+  }
+  return { ok: true };
+}
+
+/**
  * ── 프로젝트 카드 추가 방법 ──
  * 아래 배열에 객체를 하나 추가하면 카드가 자동으로 늘어납니다.
  * title/description은 ko/en/ja 세 언어를 모두 채워주세요.
