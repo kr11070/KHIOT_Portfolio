@@ -25,10 +25,13 @@ export default function ProjectCard({
   const title = pick(project.title, lang);
 
   const links = [
-    { href: project.links.caseStudy, label: pick(dict.projects.caseStudy, lang), external: false },
-    { href: project.links.demo, label: pick(dict.projects.demo, lang), external: true },
-    { href: project.links.github, label: pick(dict.projects.github, lang), external: true },
-  ].filter((l): l is { href: string; label: string; external: boolean } => Boolean(l.href));
+    { href: project.links.caseStudy, label: pick(dict.projects.caseStudy, lang), external: false, download: false },
+    { href: project.links.demo, label: pick(dict.projects.demo, lang), external: true, download: false },
+    { href: project.links.github, label: pick(dict.projects.github, lang), external: true, download: false },
+    { href: project.links.download, label: pick(dict.projects.download, lang), external: false, download: true },
+  ].filter(
+    (l): l is { href: string; label: string; external: boolean; download: boolean } => Boolean(l.href)
+  );
 
   return (
     <article className="group flex h-full flex-col overflow-hidden rounded-2.5xl border border-line bg-white/70 shadow-card transition-all hover:-translate-y-1 hover:shadow-card-hover">
@@ -78,9 +81,10 @@ export default function ProjectCard({
                 href={link.href}
                 target={link.external ? "_blank" : undefined}
                 rel={link.external ? "noopener noreferrer" : undefined}
+                download={link.download}
                 className="rounded-full border border-line px-3.5 py-1.5 text-xs font-bold text-ink transition-colors hover:border-accent-dark hover:bg-accent-soft hover:text-accent-deep"
               >
-                {link.label} ↗
+                {link.label} {link.download ? "↓" : "↗"}
               </a>
             ))}
           </div>

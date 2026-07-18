@@ -16,6 +16,8 @@ export type Project = {
     caseStudy?: string;
     demo?: string;
     github?: string;
+    /** 클릭 시 새 탭 대신 파일 다운로드를 트리거합니다 (예: 디자인 시스템 md 문서). */
+    download?: string;
   };
 };
 
@@ -33,6 +35,7 @@ type SideProjectRow = {
   link_case_study: string | null;
   link_demo: string | null;
   link_github: string | null;
+  link_download?: string | null;
   project_date?: string | null;
 };
 
@@ -53,6 +56,7 @@ function mapSideProjectRow(row: SideProjectRow): Project {
       caseStudy: row.link_case_study ?? undefined,
       demo: row.link_demo ?? undefined,
       github: row.link_github ?? undefined,
+      download: row.link_download ?? undefined,
     },
   };
 }
@@ -82,6 +86,7 @@ export type NewSideProject = {
   tech: string[];
   demo?: string;
   github?: string;
+  download?: string;
 };
 
 /**
@@ -110,6 +115,7 @@ export async function addSideProject(
     p_tech: input.tech,
     p_demo: input.demo?.trim() || null,
     p_github: input.github?.trim() || null,
+    p_download: input.download?.trim() || null,
   });
 
   if (error) {
@@ -146,6 +152,7 @@ export async function updateSideProject(
     p_tech: input.tech,
     p_demo: input.demo?.trim() || null,
     p_github: input.github?.trim() || null,
+    p_download: input.download?.trim() || null,
   });
 
   if (error) {
@@ -159,6 +166,36 @@ export async function updateSideProject(
         message: "수정 기능이 아직 설정되지 않았어요. supabase/edit_project_form.sql을 실행해주세요.",
       };
     return { ok: false, message: `저장에 실패했어요: ${error.message}` };
+  }
+  return { ok: true };
+}
+
+/**
+ * 카드의 "🗑️ 삭제" 버튼에서 호출. Supabase의 delete_side_project 함수(RPC)로 삭제하며,
+ * 비밀번호 검증은 Supabase 쪽에서 이뤄집니다 (supabase/delete_and_download.sql 참고).
+ */
+export async function deleteSideProject(
+  slug: string,
+  password: string
+): Promise<{ ok: true } | { ok: false; message: string }> {
+  if (!supabase) return { ok: false, message: "Supabase가 설정되지 않았습니다." };
+
+  const { error } = await supabase.rpc("delete_side_project", {
+    p_password: password,
+    p_slug: slug,
+  });
+
+  if (error) {
+    if (error.message.includes("ADMIN_PASSWORD_MISMATCH"))
+      return { ok: false, message: "비밀번호가 올바르지 않아요." };
+    if (error.message.includes("PROJECT_NOT_FOUND"))
+      return { ok: false, message: "이 프로젝트를 찾을 수 없어요." };
+    if (error.code === "PGRST202")
+      return {
+        ok: false,
+        message: "삭제 기능이 아직 설정되지 않았어요. supabase/delete_and_download.sql을 실행해주세요.",
+      };
+    return { ok: false, message: `삭제에 실패했어요: ${error.message}` };
   }
   return { ok: true };
 }
@@ -261,6 +298,42 @@ export const fallbackSideProjects: Project[] = [
     date: "2026.07",
     links: {
       demo: "https://claude.ai/public/artifacts/e2540493-822c-4882-b54e-d021aa4d11b8",
+    },
+  },
+  {
+    slug: "nipet-naepet-business-plan",
+    title: {
+      ko: "니펫내펫 — 반려동물 매칭 플랫폼 사업계획서",
+      en: "Nipet Naepet — Pet Matching Platform Business Plan",
+      ja: "ニペットネペット — ペットマッチングプラットフォーム事業計画書",
+    },
+    description: {
+      ko: "책임 없이 반려동물과 교감할 수 있는 매칭·위탁 플랫폼의 6개월 실행 사업계획서. 서울 영등포구를 기점으로 시드 3억 원, 18개월 손익분기 시나리오를 시장 데이터 기반으로 설계했습니다.",
+      en: "A 6-month business plan for a pet-matching platform that lets people bond with animals without full ownership. Seed funding of ₩300M, targeting break-even at 18 months in Seoul's Yeongdeungpo district, backed by market data.",
+      ja: "責任を負わずにペットと触れ合えるマッチング・預かりプラットフォームの6ヶ月実行事業計画書。ソウル永登浦区を拠点に、シード3億ウォン、18ヶ月での損益分岐を市場データに基づいて設計しました。",
+    },
+    tech: ["Business Plan", "Market Research", "Claude"],
+    date: "2026.04",
+    links: {
+      demo: "https://claude.ai/public/artifacts/395ba06b-8a10-47ac-8668-3e75cf6ddc56",
+    },
+  },
+  {
+    slug: "kissa-design-system",
+    title: {
+      ko: "喫茶 Kissa — 빈티지 디자인 시스템",
+      en: "Kissa — A Vintage-Inspired Design System",
+      ja: "喫茶 Kissa — ヴィンテージデザインシステム",
+    },
+    description: {
+      ko: "일본·대만의 옛 킷사텐(다방) 감성에서 출발한 컬러·타이포그래피 디자인 시스템. Primitive → Semantic → Molecule 3단 레이어로 214개 토큰을 구성하고, 다크 모드는 Primitive 반전만으로 전환됩니다.",
+      en: "A color and typography design system inspired by old Japanese/Taiwanese kissaten (tea rooms). 214 tokens across a three-layer Primitive → Semantic → Molecule structure, with dark mode achieved by simply inverting the Primitive scale.",
+      ja: "日本・台湾の昔ながらの喫茶店の感性から生まれたカラー・タイポグラフィのデザインシステム。Primitive → Semantic → Moleculeの3層構造で214個のトークンを構成し、ダークモードはPrimitiveの反転だけで切り替わります。",
+    },
+    tech: ["Design System", "Design Tokens", "Claude"],
+    links: {
+      demo: "https://claude.ai/public/artifacts/9f673cf7-a6ab-4807-879e-fbe8172ab2ef",
+      download: "/design-system/kissa-design-system.md",
     },
   },
 ];

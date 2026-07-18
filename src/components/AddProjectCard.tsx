@@ -24,6 +24,7 @@ export default function AddProjectCard({ onAdded }: { onAdded: () => void }) {
           .filter(Boolean),
         demo: values.demo,
         github: values.github,
+        download: values.download,
       },
       password
     );

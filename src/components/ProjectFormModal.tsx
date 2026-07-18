@@ -13,6 +13,7 @@ export type ProjectFormValues = {
   tech: string;
   demo: string;
   github: string;
+  download: string;
 };
 
 export const emptyProjectFormValues: ProjectFormValues = {
@@ -23,6 +24,7 @@ export const emptyProjectFormValues: ProjectFormValues = {
   tech: "",
   demo: "",
   github: "",
+  download: "",
 };
 
 /**
@@ -156,6 +158,17 @@ export default function ProjectFormModal({
               value={values.github}
               onChange={(e) => set("github", e.target.value)}
               placeholder="https://github.com/…"
+            />
+          </label>
+
+          <label className="flex flex-col gap-1 text-xs font-bold text-ink-soft">
+            다운로드 파일 링크 (md 등)
+            <input
+              className={inputCls}
+              type="text"
+              value={values.download}
+              onChange={(e) => set("download", e.target.value)}
+              placeholder="/design-system/kissa-design-system.md"
             />
           </label>
 

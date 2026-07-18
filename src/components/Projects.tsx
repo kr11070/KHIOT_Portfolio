@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { dict, pick, useLang } from "@/lib/i18n";
 import { fallbackSideProjects, getSideProjects, mainProjects, type Project } from "@/lib/portfolio-data";
 import AddProjectCard from "./AddProjectCard";
+import DeleteProjectButton from "./DeleteProjectButton";
 import EditProjectButton from "./EditProjectButton";
 import ProjectCard from "./ProjectCard";
 import Reveal from "./Reveal";
@@ -65,6 +66,7 @@ export function SideProjects() {
           <Reveal key={project.slug} delay={i * 100} className="relative h-full">
             <ProjectCard project={project} compact />
             <EditProjectButton project={project} onUpdated={reload} />
+            <DeleteProjectButton project={project} onDeleted={reload} />
           </Reveal>
         ))}
         <Reveal delay={sideProjects.length * 100} className="h-full">

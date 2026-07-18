@@ -27,6 +27,7 @@ export default function EditProjectButton({
     tech: project.tech.join(", "),
     demo: project.links.demo ?? "",
     github: project.links.github ?? "",
+    download: project.links.download ?? "",
   };
 
   async function handleSubmit(values: ProjectFormValues, password: string) {
@@ -43,6 +44,7 @@ export default function EditProjectButton({
           .filter(Boolean),
         demo: values.demo,
         github: values.github,
+        download: values.download,
       },
       password
     );
