@@ -59,7 +59,7 @@ export const dict = {
     caseStudy: { ko: "케이스 스터디", en: "Case Study", ja: "ケーススタディ" },
     demo: { ko: "라이브 데모", en: "Live Demo", ja: "ライブデモ" },
     github: { ko: "GitHub", en: "GitHub", ja: "GitHub" },
-    download: { ko: "MD 다운로드", en: "Download MD", ja: "MDダウンロード" },
+    download: { ko: "파일 다운로드", en: "Download File", ja: "ファイルダウンロード" },
   },
   side: {
     title: { ko: "Side Projects", en: "Side Projects", ja: "Side Projects" },

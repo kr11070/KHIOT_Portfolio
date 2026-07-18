@@ -370,6 +370,25 @@ export const fallbackSideProjects: Project[] = [
     date: "2026.05",
     links: {
       caseStudy: "/case-studies/magicpath-guide",
+      download: "/case-studies/magicpath-guide/놀이공원_스마트동선앱_PRD.docx",
+    },
+  },
+  {
+    slug: "food-hygiene-service",
+    title: {
+      ko: "AI 식품위생 관리 서비스",
+      en: "AI Food Hygiene Management Service",
+      ja: "AI食品衛生管理サービス",
+    },
+    description: {
+      ko: "자영업자를 위한 AI 기반 위생 큐레이션 서비스 PRD. 일일 체크리스트 자동 생성, 위생 점수(Health Score) 산출, 카메라 기반 AI 비전 스캐너로 사고 발생 전 위험 징후를 예방합니다.",
+      en: "A PRD for an AI-powered hygiene curation service for small food business owners — auto-generated daily checklists, a Health Score, and a camera-based AI vision scanner that catches risk signs before incidents happen.",
+      ja: "自営業者向けのAIベース衛生キュレーションサービスのPRD。日次チェックリストの自動生成、衛生スコア（Health Score）算出、カメラベースのAIビジョンスキャナーで事故発生前にリスクの兆候を予防します。",
+    },
+    tech: ["PRD", "Service Design", "AI"],
+    date: "2026.05",
+    links: {
+      download: "/projects/food-hygiene-service/식품위생관리서비스_PRD.docx",
     },
   },
 ];
