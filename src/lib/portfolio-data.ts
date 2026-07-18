@@ -336,6 +336,42 @@ export const fallbackSideProjects: Project[] = [
       download: "/design-system/kissa-design-system.md",
     },
   },
+  {
+    slug: "hankyung-eureka-ux-report",
+    title: {
+      ko: "한경유레카 UX 개선 리포트 — 2.0 개편 이후 구독자 분석",
+      en: "Hankyung Eureka UX Report — Subscriber Impact of the 2.0 Redesign",
+      ja: "韓経ユレカ UX改善レポート — 2.0リニューアル後の購読者分析",
+    },
+    description: {
+      ko: "한경유레카 앱 2.0 개편(AI 컨센서스, 유레카 프리미엄, 알고리즘 콘텐츠 UI/UX 전면 개편) 전후로 신규 유료 구독자 추이를 2024.01~2026.06 데이터로 비교 분석한 UX 리포트입니다.",
+      en: "A UX analytics report comparing new paid-subscriber trends before and after Hankyung Eureka's 2.0 redesign (AI consensus scoring, Eureka Premium, a full algorithmic content UI/UX overhaul), using Jan 2024–Jun 2026 data.",
+      ja: "韓経ユレカアプリの2.0リニューアル（AIコンセンサス、ユレカプレミアム、アルゴリズムコンテンツのUI/UX全面刷新）前後で新規有料購読者の推移を2024年1月〜2026年6月のデータで比較分析したUXレポートです。",
+    },
+    tech: ["Data Analytics", "UX Research", "Claude"],
+    date: "2026.07",
+    links: {
+      demo: "https://claude.ai/public/artifacts/90dcb3f4-fc02-4c29-aae4-b600d5e95d1c",
+    },
+  },
+  {
+    slug: "magicpath-guide",
+    title: {
+      ko: "매직패스 가이드 — 놀이공원 날씨 동선 추천 서비스",
+      en: "Magicpath Guide — Weather-Based Amusement Park Routing",
+      ja: "マジックパスガイド — 天気連動アトラクション動線推薦サービス",
+    },
+    description: {
+      ko: "실시간 날씨·혼잡도를 분석해 맞춤형 놀이공원 동선을 추천하는 서비스 콘셉트. 데이터 기반 페르소나로 사용자 니즈를 검증하고, 개요·페르소나 2개 탭으로 구성한 케이스 스터디 페이지입니다.",
+      en: "A service concept that recommends personalized amusement-park routes using real-time weather and congestion data, validated with a data-driven persona — presented as a two-tab (overview/persona) case study page.",
+      ja: "リアルタイムの天気・混雑度を分析してパーソナライズされたアトラクション動線を提案するサービスコンセプト。データドリブンなペルソナで検証し、概要・ペルソナの2つのタブで構成したケーススタディページです。",
+    },
+    tech: ["Service Design", "Figma", "UX Research"],
+    date: "2026.05",
+    links: {
+      caseStudy: "/case-studies/magicpath-guide",
+    },
+  },
 ];
 
 /** About 섹션 — 스킬 목록. 자유롭게 수정하세요. */
