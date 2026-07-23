@@ -68,6 +68,8 @@ export const dict = {
       en: "Personal projects, built light and polished steadily.",
       ja: "気軽に作り、こつこつ磨いている個人プロジェクトです。",
     },
+    sortByDate: { ko: "최신순", en: "Latest First", ja: "新着順" },
+    sortDefault: { ko: "기본순", en: "Default Order", ja: "デフォルト順" },
   },
   contact: {
     title: { ko: "Contact", en: "Contact", ja: "Contact" },
