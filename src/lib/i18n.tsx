@@ -12,7 +12,7 @@ export const dict = {
   nav: {
     about: { ko: "소개", en: "About", ja: "紹介" },
     projects: { ko: "프로젝트", en: "Projects", ja: "プロジェクト" },
-    side: { ko: "사이드 프로젝트", en: "Side Projects", ja: "サイドプロジェクト" },
+    side: { ko: "경험", en: "Experience", ja: "経験" },
     contact: { ko: "연락처", en: "Contact", ja: "連絡先" },
     resume: { ko: "이력서", en: "Resume", ja: "履歴書" },
   },
@@ -42,7 +42,7 @@ export const dict = {
       ja: "ユーザーインタビューとデータから出発し、ワイヤーフレームやインタラクティブなプロトタイプまで作るUI/UXデザイナーです。アジャイルスクラムでのチーム経験があり、アイデアを素早く動く形で検証することが好きです。",
     },
     skillsTitle: { ko: "스킬 & 툴", en: "Skills & Tools", ja: "スキル＆ツール" },
-    expTitle: { ko: "경험", en: "Experience", ja: "経験" },
+    expTitle: { ko: "타임라인", en: "Timeline", ja: "タイムライン" },
     quote: {
       ko: "“어려운 것을 쉽게 보여주는 것이 디자인의 역할이라고 믿습니다.”",
       en: "“I believe design's job is to make the difficult feel easy.”",
@@ -62,7 +62,7 @@ export const dict = {
     download: { ko: "파일 다운로드", en: "Download File", ja: "ファイルダウンロード" },
   },
   side: {
-    title: { ko: "Side Projects", en: "Side Projects", ja: "Side Projects" },
+    title: { ko: "경험", en: "Experience", ja: "経験" },
     subtitle: {
       ko: "가볍게 만들고 꾸준히 다듬는 개인 프로젝트입니다.",
       en: "Personal projects, built light and polished steadily.",

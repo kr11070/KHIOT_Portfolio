@@ -412,20 +412,26 @@ export const fallbackSideProjects: Project[] = [
   },
 ];
 
-/** About 섹션 — 스킬 목록. 자유롭게 수정하세요. */
-export const skills: string[] = [
-  "Figma / FigJam",
-  "UX Research",
-  "Wireframing",
-  "Prototyping",
-  "Design System",
-  "Jira",
-  "Agile Scrum",
-  "HTML / CSS",
-  "JavaScript",
-  "React (기초)",
-  "Chrome Extension",
-  "AI 활용 (Groq API)",
+export type Skill = {
+  name: string;
+  /** 숙련도 (0~100%) */
+  level: number;
+};
+
+/** About 섹션 — 스킬 목록과 숙련도. level 값은 예시이니 실제 역량에 맞게 자유롭게 수정하세요. */
+export const skills: Skill[] = [
+  { name: "Figma / FigJam", level: 90 },
+  { name: "UX Research", level: 80 },
+  { name: "Wireframing", level: 80 },
+  { name: "Prototyping", level: 75 },
+  { name: "Design System", level: 70 },
+  { name: "Jira", level: 60 },
+  { name: "Agile Scrum", level: 65 },
+  { name: "HTML / CSS", level: 60 },
+  { name: "JavaScript", level: 50 },
+  { name: "React (기초)", level: 40 },
+  { name: "Chrome Extension", level: 45 },
+  { name: "AI 활용 (Groq API)", level: 55 },
 ];
 
 export type ExperienceItem = {

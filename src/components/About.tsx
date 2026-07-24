@@ -35,26 +35,35 @@ export default function About() {
           </div>
         </Reveal>
 
-        <Reveal delay={150}>
-          <div className="h-full rounded-2.5xl border border-line bg-white/70 p-7 shadow-card transition-shadow hover:shadow-card-hover">
+        <Reveal className="md:col-span-3" delay={150}>
+          <div className="rounded-2.5xl border border-line bg-white/70 p-7 shadow-card transition-shadow hover:shadow-card-hover">
             <h3 className="text-sm font-bold uppercase tracking-widest text-accent-deep">
               {pick(dict.about.skillsTitle, lang)}
             </h3>
-            <ul className="mt-4 flex flex-wrap gap-2">
+            <div className="mt-6 grid grid-cols-1 gap-x-10 gap-y-5 sm:grid-cols-2">
               {skills.map((skill) => (
-                <li
-                  key={skill}
-                  className="rounded-full border border-line bg-cream px-3 py-1.5 text-xs font-semibold text-ink-soft transition-colors hover:border-accent-dark hover:text-accent-deep"
-                >
-                  {skill}
-                </li>
+                <div key={skill.name} className="flex items-center gap-4">
+                  <span className="w-32 shrink-0 text-sm font-semibold text-ink-soft sm:w-36">
+                    {skill.name}
+                  </span>
+                  <div className="relative h-2 flex-1 rounded-full bg-accent-soft">
+                    <div
+                      className="h-2 rounded-full bg-accent-dark"
+                      style={{ width: `${skill.level}%` }}
+                    />
+                    <span
+                      className="absolute top-1/2 h-3 w-3 -translate-y-1/2 rounded-full bg-accent-deep shadow"
+                      style={{ left: `calc(${skill.level}% - 6px)` }}
+                    />
+                  </div>
+                </div>
               ))}
-            </ul>
+            </div>
           </div>
         </Reveal>
 
-        <Reveal className="md:col-span-2" delay={250}>
-          <div className="h-full rounded-2.5xl border border-line bg-white/70 p-7 shadow-card transition-shadow hover:shadow-card-hover">
+        <Reveal className="md:col-span-3" delay={250}>
+          <div className="rounded-2.5xl border border-line bg-white/70 p-7 shadow-card transition-shadow hover:shadow-card-hover">
             <h3 className="text-sm font-bold uppercase tracking-widest text-accent-deep">
               {pick(dict.about.expTitle, lang)}
             </h3>
