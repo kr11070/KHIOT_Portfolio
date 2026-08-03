@@ -411,6 +411,24 @@ export const fallbackSideProjects: Project[] = [
     },
   },
   {
+    slug: "airbnb-dashboard",
+    title: {
+      ko: "에어비앤비 대시보드",
+      en: "Airbnb Impact Dashboard",
+      ja: "Airbnbインパクトダッシュボード",
+    },
+    description: {
+      ko: "에어비앤비의 국내 지역경제 기여도(GDP·일자리·게스트 지출)와 비도시 예약 비중 성장을 분석하고, 2024년 영업신고 의무화 등 규제 변화에 대응하는 호스트 시장 전략을 정리한 인사이트 대시보드입니다.",
+      en: "An insight dashboard analyzing Airbnb's contribution to Korea's regional economy (GDP, jobs, guest spending) and the growth of non-urban bookings, alongside host market strategies responding to 2024 business-registration regulations.",
+      ja: "エアビーアンドビーの国内地域経済への貢献度（GDP・雇用・ゲスト支出）と非都市部予約の増加を分析し、2024年の営業申告義務化などの規制変化に対応するホスト向け市場戦略をまとめたインサイトダッシュボードです。",
+    },
+    tech: ["Market Research", "Data Analytics", "Google AI Studio"],
+    date: "2026.04.16",
+    links: {
+      demo: "https://product-insight-dashboard-223453858568.us-west1.run.app",
+    },
+  },
+  {
     slug: "titanic-survivors-dashboard",
     title: {
       ko: "타이타닉 생존자 분석 대시보드",
