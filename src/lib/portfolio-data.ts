@@ -446,6 +446,25 @@ export const fallbackSideProjects: Project[] = [
       demo: "https://titanic-survivors-dashboard-223453858568.us-west1.run.app",
     },
   },
+  {
+    slug: "herehear-music-player",
+    title: {
+      ko: "HereHear — 지역맞춤 뮤직 플레이어",
+      en: "HereHear — Location-Curated Music Player",
+      ja: "HereHear — 位置連動ミュージックプレイヤー",
+    },
+    description: {
+      ko: "현재 위치와 취향을 입력하면 그 지역 분위기에 맞는 음악을 추천하는 AI 큐레이션 뮤직 플레이어. Gemini API로 곡을 직접 선정하고, 좋아요·스킵 반응을 학습해 추천을 개인화합니다.",
+      en: "An AI-curated music player that recommends songs matching the local mood based on your current location and taste. Gemini picks the tracks, and the app learns from likes and skips to personalize future recommendations.",
+      ja: "現在地と好みを入力すると、その地域の雰囲気に合う音楽をおすすめするAIキュレーション音楽プレイヤー。Gemini APIで楽曲を選定し、いいね・スキップの反応を学習してレコメンドを個人化します。",
+    },
+    tech: ["JavaScript", "Gemini API", "iTunes API", "Geolocation"],
+    date: "2026.06.11",
+    links: {
+      demo: "https://regal-manatee-561c2d.netlify.app",
+      github: "https://github.com/kr11070/MusicPlayer_HereHear",
+    },
+  },
 ];
 
 export type Skill = {
