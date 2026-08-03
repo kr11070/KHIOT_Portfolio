@@ -297,7 +297,7 @@ export const fallbackSideProjects: Project[] = [
     tech: ["Market Research", "TAM/SAM/SOM", "Claude"],
     date: "2026.07",
     links: {
-      demo: "https://claude.ai/public/artifacts/e2540493-822c-4882-b54e-d021aa4d11b8",
+      demo: "https://marketinsight.ai.studio",
     },
   },
   {
