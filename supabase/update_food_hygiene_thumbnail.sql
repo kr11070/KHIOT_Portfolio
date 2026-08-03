@@ -1,6 +1,7 @@
 -- Supabase SQL Editor에서 실행하세요.
--- "AI 식품위생 관리 서비스" 카드에 호버 재생 영상 썸네일을 추가합니다.
+-- 이전에 잘못 넣었던 놀이공원 동선앱 영상을 "AI 식품위생 관리 서비스" 카드에서 제거합니다.
+-- (이 영상은 magicpath-guide 카드용이었습니다 — update_magicpath_thumbnail.sql 참고)
 
 update side_projects set
-  thumbnail = 'https://ik.imagekit.io/dvkhncfzk/juheeproj/%EB%86%80%EC%9D%B4%EA%B3%B5%EC%9B%90%EB%8F%99%EC%84%A0%EC%95%B1.webm'
+  thumbnail = null
 where slug = 'food-hygiene-service';
