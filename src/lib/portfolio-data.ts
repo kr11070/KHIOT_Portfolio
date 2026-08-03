@@ -390,6 +390,7 @@ export const fallbackSideProjects: Project[] = [
     },
     tech: ["PRD", "Service Design", "AI", "Case Study"],
     date: "2026.05",
+    thumbnail: "https://ik.imagekit.io/dvkhncfzk/juheeproj/AI-%EC%9C%84%EC%83%9D%EA%B4%80%EB%A6%AC-%EC%84%9C%EB%B9%84%EC%8A%A4.webm",
     links: {
       caseStudy: "/case-studies/food-hygiene-service",
       download: "/projects/food-hygiene-service/식품위생관리서비스_PRD.docx",
