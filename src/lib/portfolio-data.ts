@@ -366,7 +366,7 @@ export const fallbackSideProjects: Project[] = [
       en: "A service concept that recommends personalized amusement-park routes using real-time weather and congestion data, validated with a data-driven persona — presented as a two-tab (overview/persona) case study page.",
       ja: "リアルタイムの天気・混雑度を分析してパーソナライズされたアトラクション動線を提案するサービスコンセプト。データドリブンなペルソナで検証し、概要・ペルソナの2つのタブで構成したケーススタディページです。",
     },
-    tech: ["Service Design", "Figma", "UX Research"],
+    tech: ["Service Design", "Figma", "UX Research", "Case Study"],
     date: "2026.05",
     links: {
       caseStudy: "/case-studies/magicpath-guide",
@@ -385,7 +385,7 @@ export const fallbackSideProjects: Project[] = [
       en: "A PRD for an AI-powered hygiene curation service for small food business owners — auto-generated daily checklists, a Health Score, and a camera-based AI vision scanner that catches risk signs before incidents happen.",
       ja: "自営業者向けのAIベース衛生キュレーションサービスのPRD。日次チェックリストの自動生成、衛生スコア（Health Score）算出、カメラベースのAIビジョンスキャナーで事故発生前にリスクの兆候を予防します。",
     },
-    tech: ["PRD", "Service Design", "AI"],
+    tech: ["PRD", "Service Design", "AI", "Case Study"],
     date: "2026.05",
     links: {
       caseStudy: "/case-studies/food-hygiene-service",
@@ -404,10 +404,28 @@ export const fallbackSideProjects: Project[] = [
       en: "A tourism app concept that surfaces sunset/lighting times and real-time crowd levels so visitors catch Gyeongju's night spots at their best moment — with an audio docent, a constellation map, and a weather-based stargazing index.",
       ja: "日没・点灯時刻とリアルタイムの混雑度を知らせ、慶州の夜景スポットを最高の瞬間に楽しめるよう導く観光アプリコンセプト。オーディオドーセント、星座マップ、天気ベースの観測指数で情緒的な夜の体験を設計しました。",
     },
-    tech: ["Service Design", "Figma", "Mobile App"],
+    tech: ["Service Design", "Figma", "Mobile App", "Case Study"],
     date: "2026.07",
     links: {
       caseStudy: "/case-studies/moonlight-journey",
+    },
+  },
+  {
+    slug: "titanic-survivors-dashboard",
+    title: {
+      ko: "타이타닉 생존자 분석 대시보드",
+      en: "Titanic Survivors Analysis Dashboard",
+      ja: "タイタニック生存者分析ダッシュボード",
+    },
+    description: {
+      ko: "타이타닉 탑승객 데이터를 분석해 좌석 등급·성별·나이에 따른 생존율을 인터랙티브 차트로 시각화한 데이터 분석 대시보드입니다.",
+      en: "An interactive data-analysis dashboard visualizing Titanic passenger survival rates by class, gender, and age.",
+      ja: "タイタニック号の乗客データを分析し、客室クラス・性別・年齢別の生存率をインタラクティブなチャートで可視化したデータ分析ダッシュボードです。",
+    },
+    tech: ["Data Analytics", "Data Visualization", "Dashboard"],
+    date: "2026.08",
+    links: {
+      demo: "https://titanic-survivors-dashboard-223453858568.us-west1.run.app",
     },
   },
 ];

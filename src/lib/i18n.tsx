@@ -12,7 +12,7 @@ export const dict = {
   nav: {
     about: { ko: "소개", en: "About", ja: "紹介" },
     projects: { ko: "프로젝트", en: "Projects", ja: "プロジェクト" },
-    side: { ko: "경험", en: "Experience", ja: "経験" },
+    side: { ko: "케이스 스터디", en: "Case Study", ja: "ケーススタディ" },
     contact: { ko: "연락처", en: "Contact", ja: "連絡先" },
     resume: { ko: "이력서", en: "Resume", ja: "履歴書" },
   },
@@ -62,7 +62,7 @@ export const dict = {
     download: { ko: "파일 다운로드", en: "Download File", ja: "ファイルダウンロード" },
   },
   side: {
-    title: { ko: "경험", en: "Experience", ja: "経験" },
+    title: { ko: "케이스 스터디", en: "Case Study", ja: "ケーススタディ" },
     subtitle: {
       ko: "가볍게 만들고 꾸준히 다듬는 개인 프로젝트입니다.",
       en: "Personal projects, built light and polished steadily.",
