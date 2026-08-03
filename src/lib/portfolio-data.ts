@@ -278,6 +278,7 @@ export const fallbackSideProjects: Project[] = [
     },
     tech: ["UX Research", "User Interview", "Claude"],
     date: "2026.04",
+    thumbnail: "https://ik.imagekit.io/dvkhncfzk/portfolio/fashionapp.webm",
     links: {
       demo: "https://claude.ai/public/artifacts/72008362-d10e-471e-92b3-80b040bba396",
     },
@@ -314,6 +315,7 @@ export const fallbackSideProjects: Project[] = [
     },
     tech: ["Business Plan", "Market Research", "Claude"],
     date: "2026.04",
+    thumbnail: "https://ik.imagekit.io/dvkhncfzk/juheeproj/pet.webm",
     links: {
       demo: "https://claude.ai/public/artifacts/395ba06b-8a10-47ac-8668-3e75cf6ddc56",
     },

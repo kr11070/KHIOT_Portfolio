@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef } from "react";
 import { dict, pick, useLang } from "@/lib/i18n";
 import type { Project } from "@/lib/portfolio-data";
 
@@ -25,6 +26,7 @@ export default function ProjectCard({
 }) {
   const { lang } = useLang();
   const title = pick(project.title, lang);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   const links = [
     { href: project.links.caseStudy, label: pick(dict.projects.caseStudy, lang), external: false, download: false },
@@ -36,14 +38,21 @@ export default function ProjectCard({
   );
 
   return (
-    <article className="group flex h-full flex-col overflow-hidden rounded-2.5xl border border-line bg-white/70 shadow-card transition-all hover:-translate-y-1 hover:shadow-card-hover">
+    <article
+      className="group flex h-full flex-col overflow-hidden rounded-2.5xl border border-line bg-white/70 shadow-card transition-all hover:-translate-y-1 hover:shadow-card-hover"
+      onMouseEnter={() => videoRef.current?.play()}
+      onMouseLeave={() => {
+        videoRef.current?.pause();
+        if (videoRef.current) videoRef.current.currentTime = 0;
+      }}
+    >
       {/* 썸네일 */}
       <div className={`overflow-hidden ${compact ? "h-36" : "h-52"}`}>
         {project.thumbnail ? (
           VIDEO_THUMBNAIL_PATTERN.test(project.thumbnail) ? (
             <video
+              ref={videoRef}
               src={project.thumbnail}
-              autoPlay
               loop
               muted
               playsInline

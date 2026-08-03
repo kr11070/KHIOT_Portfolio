@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { dict, LANGS, LANG_LABELS, pick, useLang } from "@/lib/i18n";
+import { dict, pick, useLang } from "@/lib/i18n";
 import { resumeUrl } from "@/lib/portfolio-data";
 
 const NAV_ITEMS = [
@@ -12,7 +12,7 @@ const NAV_ITEMS = [
 ] as const;
 
 export default function Navbar() {
-  const { lang, setLang } = useLang();
+  const { lang } = useLang();
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
@@ -36,30 +36,11 @@ export default function Navbar() {
         </div>
 
         <div className="flex items-center gap-3">
-          {/* 언어 토글 */}
-          <div className="flex items-center rounded-full border border-line bg-white/70 p-0.5">
-            {LANGS.map((l) => (
-              <button
-                key={l}
-                type="button"
-                onClick={() => setLang(l)}
-                aria-pressed={lang === l}
-                className={`rounded-full px-2.5 py-1 text-xs font-bold transition-all ${
-                  lang === l
-                    ? "bg-ink text-cream shadow-sm"
-                    : "text-ink-faint hover:text-ink"
-                }`}
-              >
-                {LANG_LABELS[l]}
-              </button>
-            ))}
-          </div>
-
           {/* 이력서 다운로드 */}
           <a
             href={resumeUrl}
             download
-            className="hidden rounded-full bg-accent px-4 py-2 text-sm font-bold text-accent-deep transition-all hover:bg-accent-dark hover:text-white md:inline-block"
+            className="hidden rounded-full bg-accent px-4 py-2 text-sm font-bold text-ink transition-all hover:bg-accent-dark md:inline-block"
           >
             {pick(dict.nav.resume, lang)}
           </a>
@@ -97,7 +78,7 @@ export default function Navbar() {
           <a
             href={resumeUrl}
             download
-            className="mt-2 inline-block rounded-full bg-accent px-4 py-2 text-sm font-bold text-accent-deep"
+            className="mt-2 inline-block rounded-full bg-accent px-4 py-2 text-sm font-bold text-ink"
           >
             {pick(dict.nav.resume, lang)}
           </a>
