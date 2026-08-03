@@ -464,6 +464,7 @@ export const fallbackSideProjects: Project[] = [
     },
     tech: ["JavaScript", "Gemini API", "iTunes API", "Geolocation"],
     date: "2026.06.11",
+    thumbnail: "https://ik.imagekit.io/dvkhncfzk/juheeproj/%EB%AE%A4%EC%A7%81%ED%94%8C%EB%A0%88%EC%9D%B4%EC%96%B4.webm",
     links: {
       demo: "https://regal-manatee-561c2d.netlify.app",
       github: "https://github.com/kr11070/MusicPlayer_HereHear",
