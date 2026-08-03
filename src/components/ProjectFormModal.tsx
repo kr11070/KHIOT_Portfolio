@@ -132,7 +132,7 @@ export default function ProjectFormModal({
             썸네일 이미지 URL
             <input
               className={inputCls}
-              type="url"
+              type="text"
               value={values.thumbnail}
               onChange={(e) => set("thumbnail", e.target.value)}
               placeholder="https://…/thumb.png (비우면 자동 플레이스홀더)"
@@ -143,7 +143,7 @@ export default function ProjectFormModal({
             데모/결과물 링크
             <input
               className={inputCls}
-              type="url"
+              type="text"
               value={values.demo}
               onChange={(e) => set("demo", e.target.value)}
               placeholder="https://claude.ai/public/artifacts/…"
