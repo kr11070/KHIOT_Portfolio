@@ -129,13 +129,13 @@ export default function ProjectFormModal({
           </div>
 
           <label className="flex flex-col gap-1 text-xs font-bold text-ink-soft">
-            썸네일 이미지 URL
+            썸네일 이미지/영상 URL
             <input
               className={inputCls}
               type="text"
               value={values.thumbnail}
               onChange={(e) => set("thumbnail", e.target.value)}
-              placeholder="https://…/thumb.png (비우면 자동 플레이스홀더)"
+              placeholder="https://…/thumb.png 또는 .gif·mp4 (비우면 자동 플레이스홀더)"
             />
           </label>
 

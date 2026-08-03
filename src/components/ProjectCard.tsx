@@ -3,6 +3,8 @@
 import { dict, pick, useLang } from "@/lib/i18n";
 import type { Project } from "@/lib/portfolio-data";
 
+const VIDEO_THUMBNAIL_PATTERN = /\.(mp4|webm|mov)(\?.*)?$/i;
+
 /** 썸네일이 없을 때 프로젝트 첫 글자로 만드는 그라데이션 플레이스홀더 */
 function ThumbPlaceholder({ slug, title }: { slug: string; title: string }) {
   return (
@@ -38,12 +40,23 @@ export default function ProjectCard({
       {/* 썸네일 */}
       <div className={`overflow-hidden ${compact ? "h-36" : "h-52"}`}>
         {project.thumbnail ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={project.thumbnail}
-            alt={`${title} 썸네일`}
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-          />
+          VIDEO_THUMBNAIL_PATTERN.test(project.thumbnail) ? (
+            <video
+              src={project.thumbnail}
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+          ) : (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={project.thumbnail}
+              alt={`${title} 썸네일`}
+              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+          )
         ) : (
           <ThumbPlaceholder slug={project.slug} title={title} />
         )}
