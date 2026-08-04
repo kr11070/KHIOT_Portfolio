@@ -59,7 +59,7 @@ export default function Hero() {
           <div className="mt-10 flex flex-wrap gap-3">
             <a
               href="#projects"
-              className="btn-glossy rounded-full px-6 py-3 text-sm font-bold text-accent-deep hover:-translate-y-0.5"
+              className="rounded-full bg-accent-dark px-6 py-3 text-sm font-bold text-ink transition-all hover:-translate-y-0.5 hover:bg-accent"
             >
               {pick(dict.hero.viewProjects, lang)}
             </a>

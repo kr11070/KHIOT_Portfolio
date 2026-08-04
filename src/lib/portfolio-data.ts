@@ -297,6 +297,7 @@ export const fallbackSideProjects: Project[] = [
     },
     tech: ["Market Research", "TAM/SAM/SOM", "Claude"],
     date: "2026.07",
+    thumbnail: "https://ik.imagekit.io/dvkhncfzk/juheeproj/%EC%A4%91%EA%B3%A0%EA%B1%B0%EB%9E%98",
     links: {
       demo: "https://marketinsight.ai.studio",
     },
@@ -333,6 +334,7 @@ export const fallbackSideProjects: Project[] = [
       ja: "日本・台湾の昔ながらの喫茶店の感性から生まれたカラー・タイポグラフィのデザインシステム。Primitive → Semantic → Moleculeの3層構造で214個のトークンを構成し、ダークモードはPrimitiveの反転だけで切り替わります。",
     },
     tech: ["Design System", "Design Tokens", "Claude"],
+    thumbnail: "https://ik.imagekit.io/dvkhncfzk/juheeproj/%EB%94%94%EC%9E%90%EC%9D%B8%EC%8B%9C%EC%8A%A4%ED%85%9C",
     links: {
       demo: "https://claude.ai/public/artifacts/9f673cf7-a6ab-4807-879e-fbe8172ab2ef",
       download: "/design-system/kissa-design-system.md",
@@ -352,6 +354,7 @@ export const fallbackSideProjects: Project[] = [
     },
     tech: ["Data Analytics", "UX Research", "Claude"],
     date: "2026.07",
+    thumbnail: "https://ik.imagekit.io/dvkhncfzk/juheeproj/%EC%9C%A0%EB%A0%88%EC%B9%B4",
     links: {
       demo: "https://claude.ai/public/artifacts/90dcb3f4-fc02-4c29-aae4-b600d5e95d1c",
     },
@@ -428,6 +431,7 @@ export const fallbackSideProjects: Project[] = [
     },
     tech: ["Market Research", "Data Analytics", "Google AI Studio"],
     date: "2026.04.16",
+    thumbnail: "https://ik.imagekit.io/dvkhncfzk/juheeproj/%EC%97%90%EC%96%B4%EB%B9%84%EC%95%A4%EB%B9%84",
     links: {
       demo: "https://product-insight-dashboard-223453858568.us-west1.run.app",
     },
