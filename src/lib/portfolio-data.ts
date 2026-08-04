@@ -228,16 +228,16 @@ export const mainProjects: Project[] = [
   {
     slug: "group-act",
     title: {
-      ko: "Group Act — 팀 프로젝트",
-      en: "Group Act — Team Project",
-      ja: "Group Act — チームプロジェクト",
+      ko: "Group Act — AI 기반 경제 뉴스 학습 경험 개선",
+      en: "Group Act — AI-Powered Economic News Learning Experience",
+      ja: "Group Act — AIベース経済ニュース学習体験の改善",
     },
     description: {
-      ko: "케이스 스터디를 준비 중입니다. 곧 자세한 과정과 결과물을 공개할 예정이에요.",
-      en: "Case study in progress — detailed process and outcomes coming soon.",
-      ja: "ケーススタディを準備中です。詳しいプロセスと成果物を近日公開予定です。",
+      ko: "종이신문의 밑줄·메모 경험을 모바일로 확장한 AI 기반 경제 뉴스 학습 서비스 'Papertory'. 하이라이트 요약, 쉬운 기사 설명, 게임형 콘텐츠로 경제 뉴스 입문자의 진입장벽을 낮추는 프로토타입을 팀으로 완성했습니다.",
+      en: "\"Papertory\" — an AI-powered economic news learning service that brings the paper-newspaper habit of underlining and note-taking to mobile. Built as a team, with AI highlight summaries, simplified articles, and game-like content that lower the entry barrier for news beginners.",
+      ja: "紙の新聞で線を引きメモを取る読書体験をモバイルに拡張したAIベースの経済ニュース学習サービス「Papertory」。ハイライト要約、やさしい記事解説、ゲーム型コンテンツで経済ニュース初心者の参入障壁を下げるプロトタイプをチームで完成させました。",
     },
-    tech: ["UX Research", "Figma"],
+    tech: ["UX Research", "Figma", "React", "AI"],
     links: {
       caseStudy: "/case-studies/group-act",
       github: "https://github.com/kr11070/teamproject_groupact.git",
@@ -414,6 +414,7 @@ export const fallbackSideProjects: Project[] = [
     },
     tech: ["Service Design", "Figma", "Mobile App", "Case Study"],
     date: "2026.07",
+    thumbnail: "https://ik.imagekit.io/dvkhncfzk/juheeproj/%EB%8B%AC%EB%B9%9B%EA%B8%B0%ED%96%89",
     links: {
       caseStudy: "/case-studies/moonlight-journey",
     },
@@ -451,6 +452,7 @@ export const fallbackSideProjects: Project[] = [
     },
     tech: ["Data Analytics", "Data Visualization", "Dashboard"],
     date: "2026.08",
+    thumbnail: "https://ik.imagekit.io/dvkhncfzk/juheeproj/%ED%83%80%EC%9D%B4%ED%83%80%EB%8B%89",
     links: {
       demo: "https://titanic-survivors-dashboard-223453858568.us-west1.run.app",
     },
