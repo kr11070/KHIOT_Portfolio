@@ -222,7 +222,7 @@ export const mainProjects: Project[] = [
     links: {
       caseStudy: "/case-studies/agile-squad",
       demo: "https://agileprojectprototype.netlify.app",
-      github: "https://github.com/kr11070/KHIOT_Portfolio/tree/main/design-assets/agile-squad",
+      github: "https://github.com/kr11070/teamproject_agilesquad.git",
     },
   },
   {
@@ -240,6 +240,7 @@ export const mainProjects: Project[] = [
     tech: ["UX Research", "Figma"],
     links: {
       caseStudy: "/case-studies/group-act",
+      github: "https://github.com/kr11070/teamproject_groupact.git",
     },
   },
 ];
