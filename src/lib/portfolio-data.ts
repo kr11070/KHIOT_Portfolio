@@ -201,8 +201,7 @@ export const mainProjects: Project[] = [
     tech: ["Figma", "UX Research", "Agile Scrum", "React", "Vite"],
     links: {
       caseStudy: "/case-studies/agile-squad",
-      demo: "https://agileprojectprototype.netlify.app",
-      github: "https://github.com/kr11070/teamproject_agilesquad.git",
+      github: "https://github.com/kr11070/News_easymode.git",
     },
   },
   {
@@ -235,9 +234,9 @@ export const fallbackSideProjects: Project[] = [
       ja: "ニュースやさしい言葉モード",
     },
     description: {
-      ko: "뉴스 기사를 슬라이더로 3단계 읽기 난이도로 바꾸고, 외국어 기사는 한국어로 번역해주는 Chrome 확장 프로그램. 2026년 8월 웹스토어 공개를 목표로 개발 중입니다.",
-      en: "A Chrome extension that adjusts news articles across three reading levels and translates foreign articles into Korean. Web Store launch targeted for Aug 2026.",
-      ja: "ニュース記事をスライダーで3段階の読みやすさに変換し、外国語記事を韓国語に翻訳するChrome拡張。2026年8月のストア公開を目指しています。",
+      ko: "뉴스 기사를 슬라이더로 2단계 읽기 난이도로 바꾸고, 외국어 기사는 한국어로 번역해주는 Chrome 확장 프로그램. 2026년 8월 웹스토어 공개를 목표로 개발 중입니다.",
+      en: "A Chrome extension that adjusts news articles across two reading levels and translates foreign articles into Korean. Web Store launch targeted for Aug 2026.",
+      ja: "ニュース記事をスライダーで2段階の読みやすさに変換し、外国語記事を韓国語に翻訳するChrome拡張。2026年8月のストア公開を目指しています。",
     },
     tech: ["Chrome Extension", "JavaScript", "Netlify Functions", "Groq API"],
     links: {
