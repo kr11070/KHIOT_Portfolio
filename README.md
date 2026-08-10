@@ -5,12 +5,12 @@ UX/UI 디자인 &amp; 프로덕트 매니지먼트 포트폴리오 | 프로덕�
 
 ```
 src/app/                 포트폴리오 사이트 (Next.js App Router)
-  ├─ case-studies/        Agile Squad, Group Act 케이스 스터디 상세 페이지
+  ├─ case-studies/        Group Act 케이스 스터디 상세 페이지
   └─ projects/            사이드 프로젝트 목록 페이지
 
 content/case-studies/     케이스 스터디 본문 (MDX)
 
-design-assets/            Agile Squad, Group Act 원본 산출물 (리서치, 와이어프레임, 최종본)
+design-assets/            Group Act 원본 산출물 (리서치, 와이어프레임, 최종본)
 
 public/
   ├─ images/               케이스 스터디에서 쓰는 이미지
