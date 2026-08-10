@@ -1,5 +1,6 @@
+import { collection, deleteDoc, doc, getDocs, orderBy, query, serverTimestamp, setDoc, updateDoc } from "firebase/firestore";
 import type { Lang } from "./i18n";
-import { supabase } from "./supabase";
+import { auth, db } from "./firebase";
 
 export type LocalizedText = Record<Lang, string>;
 
@@ -18,64 +19,64 @@ export type Project = {
     github?: string;
     /** 클릭 시 새 탭 대신 파일 다운로드를 트리거합니다 (예: 디자인 시스템 md 문서). */
     download?: string;
+    /** 다운로드 파일이 2개일 때 쓰는 두 번째 다운로드 링크. */
+    download2?: string;
   };
 };
 
-/** Supabase `side_projects` 테이블의 row 형태 */
-type SideProjectRow = {
-  slug: string;
-  title_ko: string;
-  title_en: string;
-  title_ja: string;
-  description_ko: string;
-  description_en: string;
-  description_ja: string;
+/** Firestore `side_projects` 컬렉션의 문서 형태 (문서 ID = slug) */
+type SideProjectDoc = {
+  title: LocalizedText;
+  description: LocalizedText;
   tech: string[];
-  thumbnail: string | null;
-  link_case_study: string | null;
-  link_demo: string | null;
-  link_github: string | null;
-  link_download?: string | null;
-  project_date?: string | null;
+  date?: string | null;
+  thumbnail?: string | null;
+  links: {
+    caseStudy?: string | null;
+    demo?: string | null;
+    github?: string | null;
+    download?: string | null;
+    download2?: string | null;
+  };
+  sortOrder: number;
 };
 
-function mapSideProjectRow(row: SideProjectRow): Project {
-  return {
-    slug: row.slug,
-    // 폼으로 추가한 카드는 한국어만 있을 수 있으므로 en/ja가 비면 ko로 대체
-    title: { ko: row.title_ko, en: row.title_en || row.title_ko, ja: row.title_ja || row.title_ko },
-    description: {
-      ko: row.description_ko,
-      en: row.description_en || row.description_ko,
-      ja: row.description_ja || row.description_ko,
-    },
-    tech: row.tech,
-    date: row.project_date ?? undefined,
-    thumbnail: row.thumbnail ?? undefined,
-    links: {
-      caseStudy: row.link_case_study ?? undefined,
-      demo: row.link_demo ?? undefined,
-      github: row.link_github ?? undefined,
-      download: row.link_download ?? undefined,
-    },
-  };
+function fromNullable<T>(v: T | null | undefined): T | undefined {
+  return v ?? undefined;
 }
 
 /**
- * 사이드 프로젝트 목록을 Supabase `side_projects` 테이블에서 가져옵니다.
- * Supabase가 설정되지 않았거나 조회에 실패하면 아래 fallbackSideProjects로 대체합니다.
+ * 사이드 프로젝트 목록을 Firestore `side_projects` 컬렉션에서 가져옵니다.
+ * Firebase가 설정되지 않았거나 조회에 실패하면 아래 fallbackSideProjects로 대체합니다.
  */
 export async function getSideProjects(): Promise<Project[]> {
-  if (!supabase) return fallbackSideProjects;
+  if (!db) return fallbackSideProjects;
 
-  const { data, error } = await supabase
-    .from("side_projects")
-    .select("*")
-    .order("sort_order", { ascending: true });
+  try {
+    const snap = await getDocs(query(collection(db, "side_projects"), orderBy("sortOrder", "asc")));
+    if (snap.empty) return fallbackSideProjects;
 
-  if (error || !data || data.length === 0) return fallbackSideProjects;
-
-  return (data as SideProjectRow[]).map(mapSideProjectRow);
+    return snap.docs.map((d) => {
+      const data = d.data() as SideProjectDoc;
+      return {
+        slug: d.id,
+        title: data.title,
+        description: data.description,
+        tech: data.tech,
+        date: fromNullable(data.date),
+        thumbnail: fromNullable(data.thumbnail),
+        links: {
+          caseStudy: fromNullable(data.links.caseStudy),
+          demo: fromNullable(data.links.demo),
+          github: fromNullable(data.links.github),
+          download: fromNullable(data.links.download),
+          download2: fromNullable(data.links.download2),
+        },
+      };
+    });
+  } catch {
+    return fallbackSideProjects;
+  }
 }
 
 export type NewSideProject = {
@@ -89,15 +90,21 @@ export type NewSideProject = {
   download?: string;
 };
 
+/** 빈 문자열은 null로, 나머지는 trim해서 저장 (Firestore는 undefined 필드를 허용하지 않음) */
+function orNull(v?: string) {
+  const trimmed = v?.trim();
+  return trimmed ? trimmed : null;
+}
+
 /**
- * "프로젝트 추가" 폼에서 호출. Supabase의 add_side_project 함수(RPC)로 저장하며,
- * 비밀번호 검증은 Supabase 쪽에서 이뤄집니다 (supabase/add_project_form.sql 참고).
+ * "프로젝트 추가" 폼에서 호출. 로그인된 관리자만 Firestore에 새 문서를 만들 수 있습니다
+ * (쓰기 권한은 Firestore 보안 규칙에서 request.auth로 검증).
  */
 export async function addSideProject(
-  input: NewSideProject,
-  password: string
+  input: NewSideProject
 ): Promise<{ ok: true } | { ok: false; message: string }> {
-  if (!supabase) return { ok: false, message: "Supabase가 설정되지 않았습니다." };
+  if (!db || !auth) return { ok: false, message: "Firebase가 설정되지 않았습니다." };
+  if (!auth.currentUser) return { ok: false, message: "로그인이 필요해요." };
 
   const base = input.title
     .toLowerCase()
@@ -105,99 +112,72 @@ export async function addSideProject(
     .replace(/^-+|-+$/g, "");
   const slug = `${base || "project"}-${Date.now()}`;
 
-  const { error } = await supabase.rpc("add_side_project", {
-    p_password: password,
-    p_slug: slug,
-    p_title: input.title.trim(),
-    p_description: input.description.trim(),
-    p_date: input.date?.trim() || null,
-    p_thumbnail: input.thumbnail?.trim() || null,
-    p_tech: input.tech,
-    p_demo: input.demo?.trim() || null,
-    p_github: input.github?.trim() || null,
-    p_download: input.download?.trim() || null,
-  });
+  try {
+    const snap = await getDocs(collection(db, "side_projects"));
+    const maxSort = snap.docs.reduce((max, d) => Math.max(max, (d.data().sortOrder as number) ?? 0), 0);
 
-  if (error) {
-    if (error.message.includes("ADMIN_PASSWORD_MISMATCH"))
-      return { ok: false, message: "비밀번호가 올바르지 않아요." };
-    if (error.code === "PGRST202")
-      return {
-        ok: false,
-        message: "추가 기능이 아직 설정되지 않았어요. supabase/add_project_form.sql을 실행해주세요.",
-      };
-    return { ok: false, message: `저장에 실패했어요: ${error.message}` };
+    await setDoc(doc(db, "side_projects", slug), {
+      title: { ko: input.title.trim(), en: input.title.trim(), ja: input.title.trim() },
+      description: { ko: input.description.trim(), en: input.description.trim(), ja: input.description.trim() },
+      tech: input.tech,
+      date: orNull(input.date),
+      thumbnail: orNull(input.thumbnail),
+      links: {
+        demo: orNull(input.demo),
+        github: orNull(input.github),
+        download: orNull(input.download),
+      },
+      sortOrder: maxSort + 10,
+      createdAt: serverTimestamp(),
+    });
+    return { ok: true };
+  } catch (error) {
+    return { ok: false, message: `저장에 실패했어요: ${(error as Error).message}` };
   }
-  return { ok: true };
 }
 
 /**
- * 카드의 "✏️ 수정" 폼에서 호출. Supabase의 update_side_project 함수(RPC)로 갱신하며,
- * 비밀번호 검증은 Supabase 쪽에서 이뤄집니다 (supabase/edit_project_form.sql 참고).
+ * 카드의 "✏️ 수정" 폼에서 호출. 로그인된 관리자만 문서를 갱신할 수 있습니다.
  */
 export async function updateSideProject(
   slug: string,
-  input: NewSideProject,
-  password: string
+  input: NewSideProject
 ): Promise<{ ok: true } | { ok: false; message: string }> {
-  if (!supabase) return { ok: false, message: "Supabase가 설정되지 않았습니다." };
+  if (!db || !auth) return { ok: false, message: "Firebase가 설정되지 않았습니다." };
+  if (!auth.currentUser) return { ok: false, message: "로그인이 필요해요." };
 
-  const { error } = await supabase.rpc("update_side_project", {
-    p_password: password,
-    p_slug: slug,
-    p_title: input.title.trim(),
-    p_description: input.description.trim(),
-    p_date: input.date?.trim() || null,
-    p_thumbnail: input.thumbnail?.trim() || null,
-    p_tech: input.tech,
-    p_demo: input.demo?.trim() || null,
-    p_github: input.github?.trim() || null,
-    p_download: input.download?.trim() || null,
-  });
-
-  if (error) {
-    if (error.message.includes("ADMIN_PASSWORD_MISMATCH"))
-      return { ok: false, message: "비밀번호가 올바르지 않아요." };
-    if (error.message.includes("PROJECT_NOT_FOUND"))
-      return { ok: false, message: "이 프로젝트를 찾을 수 없어요." };
-    if (error.code === "PGRST202")
-      return {
-        ok: false,
-        message: "수정 기능이 아직 설정되지 않았어요. supabase/edit_project_form.sql을 실행해주세요.",
-      };
-    return { ok: false, message: `저장에 실패했어요: ${error.message}` };
+  try {
+    await updateDoc(doc(db, "side_projects", slug), {
+      title: { ko: input.title.trim(), en: input.title.trim(), ja: input.title.trim() },
+      description: { ko: input.description.trim(), en: input.description.trim(), ja: input.description.trim() },
+      tech: input.tech,
+      date: orNull(input.date),
+      thumbnail: orNull(input.thumbnail),
+      "links.demo": orNull(input.demo),
+      "links.github": orNull(input.github),
+      "links.download": orNull(input.download),
+    });
+    return { ok: true };
+  } catch (error) {
+    return { ok: false, message: `저장에 실패했어요: ${(error as Error).message}` };
   }
-  return { ok: true };
 }
 
 /**
- * 카드의 "🗑️ 삭제" 버튼에서 호출. Supabase의 delete_side_project 함수(RPC)로 삭제하며,
- * 비밀번호 검증은 Supabase 쪽에서 이뤄집니다 (supabase/delete_and_download.sql 참고).
+ * 카드의 "🗑️ 삭제" 버튼에서 호출. 로그인된 관리자만 문서를 삭제할 수 있습니다.
  */
 export async function deleteSideProject(
-  slug: string,
-  password: string
+  slug: string
 ): Promise<{ ok: true } | { ok: false; message: string }> {
-  if (!supabase) return { ok: false, message: "Supabase가 설정되지 않았습니다." };
+  if (!db || !auth) return { ok: false, message: "Firebase가 설정되지 않았습니다." };
+  if (!auth.currentUser) return { ok: false, message: "로그인이 필요해요." };
 
-  const { error } = await supabase.rpc("delete_side_project", {
-    p_password: password,
-    p_slug: slug,
-  });
-
-  if (error) {
-    if (error.message.includes("ADMIN_PASSWORD_MISMATCH"))
-      return { ok: false, message: "비밀번호가 올바르지 않아요." };
-    if (error.message.includes("PROJECT_NOT_FOUND"))
-      return { ok: false, message: "이 프로젝트를 찾을 수 없어요." };
-    if (error.code === "PGRST202")
-      return {
-        ok: false,
-        message: "삭제 기능이 아직 설정되지 않았어요. supabase/delete_and_download.sql을 실행해주세요.",
-      };
-    return { ok: false, message: `삭제에 실패했어요: ${error.message}` };
+  try {
+    await deleteDoc(doc(db, "side_projects", slug));
+    return { ok: true };
+  } catch (error) {
+    return { ok: false, message: `삭제에 실패했어요: ${(error as Error).message}` };
   }
-  return { ok: true };
 }
 
 /**
@@ -226,7 +206,7 @@ export const mainProjects: Project[] = [
   },
 ];
 
-/** Supabase 조회 실패 시 대체로 쓰이는 정적 목록 (side_projects 테이블 초기 시드와 내용을 맞춰주세요) */
+/** Firestore 조회 실패 시 대체로 쓰이는 정적 목록 (Firestore의 side_projects 컬렉션과 내용을 맞춰주세요) */
 export const fallbackSideProjects: Project[] = [
   {
     slug: "news-reading-mode",
@@ -379,6 +359,7 @@ export const fallbackSideProjects: Project[] = [
     links: {
       caseStudy: "/case-studies/food-hygiene-service",
       download: "/projects/food-hygiene-service/식품위생관리서비스_PRD.docx",
+      download2: "/projects/food-hygiene-service/식품위생관리서비스_PRD_상세.xlsx",
     },
   },
   {
@@ -454,7 +435,7 @@ export const fallbackSideProjects: Project[] = [
     date: "2026.06.11",
     thumbnail: "https://ik.imagekit.io/dvkhncfzk/juheeproj/%EB%AE%A4%EC%A7%81%ED%94%8C%EB%A0%88%EC%9D%B4%EC%96%B4.webm",
     links: {
-      demo: "https://regal-manatee-561c2d.netlify.app",
+      demo: "https://herehear.leejuhee010340.workers.dev",
       github: "https://github.com/kr11070/MusicPlayer_HereHear",
     },
   },

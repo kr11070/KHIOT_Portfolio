@@ -28,8 +28,8 @@ export const emptyProjectFormValues: ProjectFormValues = {
 };
 
 /**
- * 프로젝트 추가/수정 공통 모달. 비밀번호 검증은 항상 Supabase 함수 쪽에서 이뤄지므로
- * 여기서는 폼 상태와 제출만 다룹니다.
+ * 프로젝트 추가/수정 공통 모달. 로그인 여부는 이 모달을 여는 쪽(EditProjectButton 등)에서
+ * 미리 확인하므로, 여기서는 폼 상태와 제출만 다룹니다.
  */
 export default function ProjectFormModal({
   heading,
@@ -41,11 +41,10 @@ export default function ProjectFormModal({
   heading: string;
   submitLabel: string;
   initialValues: ProjectFormValues;
-  onSubmit: (values: ProjectFormValues, password: string) => Promise<{ ok: true } | { ok: false; message: string }>;
+  onSubmit: (values: ProjectFormValues) => Promise<{ ok: true } | { ok: false; message: string }>;
   onClose: () => void;
 }) {
   const [values, setValues] = useState(initialValues);
-  const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -58,7 +57,7 @@ export default function ProjectFormModal({
     setSubmitting(true);
     setError(null);
 
-    const result = await onSubmit(values, password);
+    const result = await onSubmit(values);
 
     setSubmitting(false);
     if (!result.ok) {
@@ -169,18 +168,6 @@ export default function ProjectFormModal({
               value={values.download}
               onChange={(e) => set("download", e.target.value)}
               placeholder="/design-system/kissa-design-system.md"
-            />
-          </label>
-
-          <label className="flex flex-col gap-1 text-xs font-bold text-ink-soft">
-            관리 비밀번호 *
-            <input
-              className={inputCls}
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              placeholder="Supabase에 설정한 비밀번호"
             />
           </label>
 

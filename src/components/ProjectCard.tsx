@@ -27,19 +27,36 @@ export default function ProjectCard({
   const { lang } = useLang();
   const title = pick(project.title, lang);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const category = project.tech[0];
+
+  // 다운로드 파일이 2개면 확장자를 붙여 구분 (예: "파일 다운로드 (DOCX)")
+  const downloadLabel = pick(dict.projects.download, lang);
+  const fileExt = (href?: string) => href?.split(".").pop()?.toUpperCase();
+  const hasTwoDownloads = Boolean(project.links.download && project.links.download2);
 
   const links = [
     { href: project.links.caseStudy, label: pick(dict.projects.caseStudy, lang), external: false, download: false },
     { href: project.links.demo, label: pick(dict.projects.demo, lang), external: true, download: false },
     { href: project.links.github, label: pick(dict.projects.github, lang), external: true, download: false },
-    { href: project.links.download, label: pick(dict.projects.download, lang), external: false, download: true },
+    {
+      href: project.links.download,
+      label: hasTwoDownloads ? `${downloadLabel} (${fileExt(project.links.download)})` : downloadLabel,
+      external: false,
+      download: true,
+    },
+    {
+      href: project.links.download2,
+      label: `${downloadLabel} (${fileExt(project.links.download2)})`,
+      external: false,
+      download: true,
+    },
   ].filter(
     (l): l is { href: string; label: string; external: boolean; download: boolean } => Boolean(l.href)
   );
 
   return (
     <article
-      className="group flex h-full flex-col overflow-hidden rounded-2.5xl border border-line bg-white/70 shadow-card transition-all hover:-translate-y-1 hover:shadow-card-hover"
+      className="group flex h-full flex-col"
       onMouseEnter={() => videoRef.current?.play()}
       onMouseLeave={() => {
         videoRef.current?.pause();
@@ -47,7 +64,7 @@ export default function ProjectCard({
       }}
     >
       {/* 썸네일 */}
-      <div className={`overflow-hidden ${compact ? "h-36" : "h-52"}`}>
+      <div className={`relative overflow-hidden rounded-2xl ${compact ? "h-36" : "h-52"}`}>
         {project.thumbnail ? (
           VIDEO_THUMBNAIL_PATTERN.test(project.thumbnail) ? (
             <video
@@ -69,34 +86,35 @@ export default function ProjectCard({
         ) : (
           <ThumbPlaceholder slug={project.slug} title={title} />
         )}
+
+        {project.date && (
+          <span className="absolute left-3 top-3 rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-bold tracking-wide text-ink shadow-sm">
+            {project.date}
+          </span>
+        )}
       </div>
 
-      <div className="flex flex-1 flex-col p-6">
-        {project.date && (
-          <p className="mb-1 text-[11px] font-bold tracking-wide text-ink-soft/70">{project.date}</p>
+      <div className="mt-4 flex flex-1 flex-col">
+        {category && (
+          <div className="flex items-center justify-between text-[11px] font-bold uppercase tracking-widest text-ink-faint">
+            <span>{category}</span>
+            <span aria-hidden="true" className="transition-transform group-hover:translate-x-0.5">
+              →
+            </span>
+          </div>
         )}
-        <h3 className={`font-extrabold tracking-tight ${compact ? "text-lg" : "text-xl"}`}>
+        <div className="mt-2 border-t border-line" />
+
+        <h3 className={`mt-3 font-extrabold tracking-tight ${compact ? "text-lg" : "text-xl"}`}>
           {title}
         </h3>
-        <p className="mt-2.5 flex-1 text-sm leading-relaxed text-ink-soft">
+        <p className="mt-2 flex-1 text-sm leading-relaxed text-ink-soft">
           {pick(project.description, lang)}
         </p>
 
-        {/* 사용 기술 */}
-        <ul className="mt-4 flex flex-wrap gap-1.5">
-          {project.tech.map((t) => (
-            <li
-              key={t}
-              className="rounded-full bg-accent-soft px-2.5 py-1 text-[11px] font-bold text-accent-deep"
-            >
-              {t}
-            </li>
-          ))}
-        </ul>
-
         {/* 링크 */}
         {links.length > 0 && (
-          <div className="mt-5 flex flex-wrap gap-2">
+          <div className="mt-4 flex flex-wrap gap-2">
             {links.map((link) => (
               <a
                 key={link.label}

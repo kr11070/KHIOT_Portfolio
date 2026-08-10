@@ -2,12 +2,13 @@
 
 import { useState } from "react";
 import { pick, useLang } from "@/lib/i18n";
+import { useAdminAuth } from "@/lib/useAdminAuth";
 import { deleteSideProject, type Project } from "@/lib/portfolio-data";
+import AdminLoginModal from "./AdminLoginModal";
 
 /**
- * 사이드 프로젝트 카드 우상단, 수정 버튼 옆에 얹는 휴지통 아이콘.
- * 클릭하면 비밀번호를 묻는 작은 확인 창이 뜨고, 확인 시 Supabase
- * delete_side_project 함수가 비밀번호를 검증한 뒤 삭제합니다.
+ * 사이드 프로젝트 카드 우상단, 수정 버튼 옆에 얹는 휴지통 아이콘. 로그인이 안 되어 있으면
+ * 로그인 모달을 먼저 띄우고, 로그인된 상태면 삭제 확인 창을 엽니다.
  */
 export default function DeleteProjectButton({
   project,
@@ -17,21 +18,26 @@ export default function DeleteProjectButton({
   onDeleted: () => void;
 }) {
   const { lang } = useLang();
+  const { user } = useAdminAuth();
+  const [showLogin, setShowLogin] = useState(false);
   const [open, setOpen] = useState(false);
-  const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  function handleClick() {
+    if (user) setOpen(true);
+    else setShowLogin(true);
+  }
+
   function close() {
     setOpen(false);
-    setPassword("");
     setError(null);
   }
 
   async function handleDelete() {
     setSubmitting(true);
     setError(null);
-    const result = await deleteSideProject(project.slug, password);
+    const result = await deleteSideProject(project.slug);
     setSubmitting(false);
     if (!result.ok) {
       setError(result.message);
@@ -44,13 +50,23 @@ export default function DeleteProjectButton({
     <>
       <button
         type="button"
-        onClick={() => setOpen(true)}
+        onClick={handleClick}
         aria-label="프로젝트 삭제"
         title="프로젝트 삭제"
         className="absolute right-12 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full border border-line bg-white/90 text-sm text-ink-soft shadow-sm transition-colors hover:border-red-400 hover:text-red-600"
       >
         🗑️
       </button>
+
+      {showLogin && (
+        <AdminLoginModal
+          onSuccess={() => {
+            setShowLogin(false);
+            setOpen(true);
+          }}
+          onClose={() => setShowLogin(false)}
+        />
+      )}
 
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
@@ -72,17 +88,6 @@ export default function DeleteProjectButton({
               삭제할까요? 이 작업은 되돌릴 수 없습니다.
             </p>
 
-            <label className="mt-4 flex flex-col gap-1 text-xs font-bold text-ink-soft">
-              관리 비밀번호 *
-              <input
-                className="w-full rounded-xl border border-line bg-white px-3 py-2 text-sm text-ink outline-none transition-colors focus:border-accent-dark"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Supabase에 설정한 비밀번호"
-              />
-            </label>
-
             {error && (
               <p className="mt-3 rounded-xl bg-red-50 px-3 py-2 text-xs font-bold text-red-600">
                 {error}
@@ -100,7 +105,7 @@ export default function DeleteProjectButton({
               <button
                 type="button"
                 onClick={handleDelete}
-                disabled={submitting || !password}
+                disabled={submitting}
                 className="rounded-full bg-red-600 px-4 py-2 text-xs font-bold text-white transition-opacity hover:opacity-85 disabled:opacity-50"
               >
                 {submitting ? "삭제 중…" : "삭제하기"}
