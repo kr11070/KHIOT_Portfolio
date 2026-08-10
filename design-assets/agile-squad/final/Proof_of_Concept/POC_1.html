@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>한경 POC — 수치 신뢰 + AI 연계 + 구독 통합</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;700;900&family=Noto+Sans+KR:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Jua&family=Gowun+Dodum&display=swap');
+
+:root{
+  --paper:#f7f5f0;
+  --paper-2:#efece4;
+  --ink:#14171c;
+  --ink-soft:#3c4047;
+  --line:#dcd8cc;
+  --line-strong:#b9b3a1;
+  --hankyung:#0b3d91;
+  --hankyung-deep:#082b66;
+  --accent:#c0392b;
+  --good:#0f7a52;
+  --paper-card:#ffffff;
+  --tag-bg:#eef1f7;
+  --shadow:0 2px 14px rgba(20,23,28,0.08);
+
+  /* kid theme palette — used only inside body.easy-on overrides below */
+  --k-bg:#fff6e0;
+  --k-bg2:#ffefc2;
+  --k-ink:#332f63;
+  --k-ink-soft:#7a6fb0;
+  --k-line:#ffd166;
+  --k-line-strong:#ffb703;
+  --k-primary:#ff5d8f;
+  --k-primary-deep:#e0436f;
+  --k-accent:#ff7a3d;
+  --k-good:#13c08a;
+  --k-card:#ffffff;
+  --k-tag:#d6f3ff;
+  --k-blue:#4cc9f0;
+  --k-purple:#a78bfa;
+  --k-green:#7bdb8f;
+  --k-yellow:#ffd60a;
+  --k-shadow:0 4px 0 rgba(51,47,99,0.12);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--paper-2);
+  color:var(--ink);
+  font-family:"Noto Sans KR",sans-serif;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  transition:background .25s;
+}
+
+/* ===== Kid theme — activated by the easy mode toggle ===== */
+body.easy-on{
+  --paper:var(--k-bg);
+  --paper-2:var(--k-bg2);
+  --ink:var(--k-ink);
+  --ink-soft:var(--k-ink-soft);
+  --line:var(--k-line);
+  --line-strong:var(--k-line-strong);
+  --hankyung:var(--k-primary);
+  --hankyung-deep:var(--k-primary-deep);
+  --accent:var(--k-accent);
+  --good:var(--k-good);
+  --paper-card:var(--k-card);
+  --tag-bg:var(--k-tag);
+  --shadow:var(--k-shadow);
+  font-family:"Gowun Dodum","Noto Sans KR",sans-serif;
+}
+body.easy-on .poc-frame{
+  border-left:1px solid var(--k-line-strong);
+  border-right:1px solid var(--k-line-strong);
+}
+body.easy-on .masthead{border-bottom:3px dashed var(--k-primary);}
+body.easy-on .logo,
+body.easy-on .kicker,
+body.easy-on .easy-headline,
+body.easy-on .ai-panel-title,
+body.easy-on .sub-modal-head h2,
+body.easy-on .glossary-box h4{
+  font-family:"Jua","Noto Sans KR",sans-serif;
+}
+body.easy-on .easy-lede,
+body.easy-on .easy-body{color:var(--k-ink);}
+body.easy-on .easy-headline{font-size:27px;}
+body.easy-on .stat-inline:hover{background:var(--k-tag);}
+body.easy-on .stat-popover-row{border-bottom:1px solid var(--k-bg2);}
+body.easy-on .stat-btn:hover{background:var(--k-bg2);}
+body.easy-on .comment-item{border-bottom:1px dashed var(--k-line);}
+body.easy-on .ai-dot{background:var(--k-good);}
+body.easy-on .ai-chip:hover{background:#bfeaff;}
+body.easy-on .ai-row{border-bottom:1px dashed var(--k-bg2);}
+body.easy-on .ai-verdict{background:#e3fbf1;color:#0a8f68;}
+body.easy-on .glossary-box{
+  background:#fffaf0;border:2px dashed var(--k-line-strong);border-radius:18px;
+}
+body.easy-on .article-wrap,
+body.easy-on .float-ai-btn,
+body.easy-on .comment-block,
+body.easy-on .ai-panel,
+body.easy-on .sub-modal,
+body.easy-on .sub-card,
+body.easy-on .toast,
+body.easy-on .step-pill,
+body.easy-on .stat-popover{border-radius:18px;}
+body.easy-on .stat-btn,
+body.easy-on .ai-chip,
+body.easy-on .sub-cta,
+body.easy-on .easy-switch .track{border-radius:999px;}
+body.easy-on .float-ai-btn{
+  background:var(--k-primary);box-shadow:0 6px 0 var(--k-primary-deep);
+}
+body.easy-on .float-ai-btn:hover{transform:scale(1.08) rotate(-4deg);}
+body.easy-on .float-ai-btn .pulse{border-color:var(--k-yellow);}
+body.easy-on .toast{background:var(--k-ink);}
+body.easy-on .glossary-item:nth-child(1) .glossary-term{color:var(--k-primary-deep);}
+body.easy-on .glossary-item:nth-child(2) .glossary-term{color:#1f8fae;}
+body.easy-on .glossary-item:nth-child(3) .glossary-term{color:#6b4fc4;}
+body.easy-on .glossary-item:nth-child(4) .glossary-term{color:#1c8f55;}
+body.easy-on .glossary-item:nth-child(5) .glossary-term{color:#c2660a;}
+body.easy-on .easy-body .stat-inline:nth-of-type(1),
+body.easy-on [data-stat="1"]{border-bottom-color:var(--k-primary);color:var(--k-primary-deep);}
+body.easy-on [data-stat="2"]{border-bottom-color:var(--k-blue);color:#1f8fae;}
+body.easy-on [data-stat="3"]{border-bottom-color:var(--k-purple);color:#6b4fc4;}
+body.easy-on .expert-badge{background:var(--k-tag);color:#1f8fae;}
+body.easy-on .sub-card.featured{border:3px solid var(--k-primary);}
+body.easy-on .sub-card.featured .sub-cta{background:var(--k-primary);}
+body.easy-on .sub-card.featured .sub-cta:hover{background:var(--k-primary-deep);}
+body.easy-on .sub-feat li::before{color:var(--k-good);}
+.mono{font-family:"JetBrains Mono",monospace;}
+.serif{font-family:"Noto Serif KR",serif;}
+
+/* ===== POC frame chrome ===== */
+.poc-frame{
+  max-width:920px;margin:0 auto;
+  background:var(--paper);
+  min-height:100vh;
+  border-left:1px solid var(--line);
+  border-right:1px solid var(--line);
+}
+.poc-banner{
+  background:var(--ink);color:#fff;
+  padding:10px 22px;
+  display:flex;align-items:center;justify-content:space-between;
+  font-family:"JetBrains Mono",monospace;font-size:11.5px;letter-spacing:.02em;
+  gap:10px;flex-wrap:wrap;
+}
+.poc-banner .tag{
+  background:rgba(255,255,255,0.12);padding:3px 9px;border-radius:999px;
+}
+.step-rail{
+  position:sticky;top:0;z-index:60;
+  background:#fff;border-bottom:1px solid var(--line);
+  padding:10px 22px;
+  display:flex;gap:8px;overflow-x:auto;
+}
+.step-pill{
+  flex-shrink:0;
+  font-family:"JetBrains Mono",monospace;
+  font-size:11px;font-weight:600;
+  padding:7px 13px;border-radius:999px;
+  border:1px solid var(--line-strong);
+  background:#fff;color:var(--ink-soft);
+  cursor:pointer;white-space:nowrap;
+  transition:all .15s;
+}
+.step-pill:hover{border-color:var(--hankyung);}
+.step-pill.active{
+  background:var(--hankyung);border-color:var(--hankyung);color:#fff;
+}
+.step-pill .n{opacity:.6;margin-right:5px;}
+
+/* ===== Masthead ===== */
+.masthead{
+  padding:20px 24px 16px;border-bottom:3px solid var(--ink);
+  display:flex;align-items:baseline;justify-content:space-between;
+  flex-wrap:wrap;gap:8px;
+}
+.masthead .logo{
+  font-family:"Noto Serif KR",serif;font-weight:900;font-size:26px;
+  color:var(--hankyung);letter-spacing:-0.01em;
+}
+.masthead .date{font-size:12px;color:var(--ink-soft);font-family:"JetBrains Mono",monospace;}
+.masthead-right{display:flex;align-items:center;gap:14px;}
+
+/* ===== Easy mode toggle ===== */
+.easy-toggle{
+  display:flex;align-items:center;gap:8px;
+}
+.easy-toggle .lbl{font-size:12.5px;font-weight:600;color:var(--ink-soft);}
+.easy-switch{
+  position:relative;width:42px;height:24px;flex-shrink:0;
+}
+.easy-switch input{
+  position:absolute;inset:0;opacity:0;cursor:pointer;margin:0;
+}
+.easy-switch .track{
+  position:absolute;inset:0;border-radius:999px;
+  background:var(--line-strong);
+  transition:background .18s;
+}
+.easy-switch .knob{
+  position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;
+  background:#fff;transition:transform .18s;
+  box-shadow:0 1px 3px rgba(0,0,0,0.25);
+}
+.easy-switch input:checked + .track{background:var(--good);}
+.easy-switch input:checked + .track + .knob{transform:translateX(18px);}
+.easy-switch input:focus-visible + .track{outline:2px solid var(--hankyung);outline-offset:2px;}
+body.easy-on .easy-switch .knob::after{
+  content:"★";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:9px;color:var(--k-yellow);
+}
+.easy-badge{
+  display:none;
+  font-family:"JetBrains Mono",monospace;font-size:10.5px;font-weight:700;
+  background:#eaf6ef;color:var(--good);padding:3px 8px;border-radius:6px;
+}
+body.easy-on .easy-badge{display:inline-block;}
+
+/* content swap */
+.mode-easy{display:none;}
+body.easy-on .mode-normal{display:none;}
+body.easy-on .mode-easy{display:block;}
+body.easy-on .mode-easy.inline{display:inline;}
+
+.easy-headline{
+  font-family:"Noto Sans KR",sans-serif;font-weight:700;font-size:26px;line-height:1.5;
+  margin-bottom:14px;color:var(--ink);
+}
+.easy-lede, .easy-body{
+  font-size:16.5px;line-height:2;color:#262a30;
+}
+.easy-lede{margin-bottom:22px;}
+.easy-body{margin-bottom:20px;}
+
+.glossary-box{
+  margin-top:6px;margin-bottom:28px;
+  background:#fbfaf6;border:1px solid var(--line);border-radius:12px;
+  padding:16px 18px;
+}
+.glossary-box h4{
+  font-size:13px;font-weight:700;margin-bottom:10px;color:var(--ink-soft);
+  display:flex;align-items:center;gap:6px;
+}
+.glossary-list{display:grid;gap:10px;}
+.glossary-item{display:flex;gap:10px;font-size:13px;line-height:1.6;}
+.glossary-term{
+  flex-shrink:0;min-width:64px;font-weight:700;color:var(--hankyung-deep);
+  font-family:"JetBrains Mono",monospace;font-size:12px;
+}
+.glossary-def{color:var(--ink-soft);}
+
+/* ===== Article ===== */
+.article-wrap{padding:30px 24px 80px;position:relative;}
+.kicker{
+  font-family:"JetBrains Mono",monospace;font-size:12px;font-weight:700;
+  color:var(--accent);letter-spacing:.06em;margin-bottom:10px;
+}
+.headline{
+  font-family:"Noto Serif KR",serif;font-weight:900;font-size:30px;line-height:1.35;
+  margin-bottom:14px;color:var(--ink);
+}
+.byline{font-size:12.5px;color:var(--ink-soft);margin-bottom:26px;display:flex;gap:14px;}
+.lede{font-size:16px;line-height:1.85;margin-bottom:22px;color:var(--ink);}
+.body-text{font-size:15.5px;line-height:1.95;color:#262a30;margin-bottom:20px;}
+.body-text + .body-text{margin-top:-4px;}
+
+/* ===== Inline stat with caption standardization (IDEA 04) ===== */
+.stat-inline{
+  position:relative;
+  display:inline;
+  border-bottom:2px dotted var(--hankyung);
+  cursor:pointer;
+  font-weight:600;
+  color:var(--hankyung-deep);
+}
+.stat-inline:hover{background:#e9eef8;}
+.stat-popover{
+  display:none;
+  position:absolute;
+  left:0;top:calc(100% + 8px);
+  width:300px;
+  background:#fff;
+  border:1px solid var(--line-strong);
+  border-radius:10px;
+  box-shadow:var(--shadow);
+  padding:14px 16px;
+  z-index:40;
+  font-size:13px;
+}
+.stat-inline.open .stat-popover{display:block;}
+.stat-popover-row{
+  display:flex;justify-content:space-between;gap:10px;
+  padding:5px 0;border-bottom:1px solid #f0ede5;
+}
+.stat-popover-row:last-child{border-bottom:none;}
+.stat-popover-row .k{color:var(--ink-soft);font-size:12px;}
+.stat-popover-row .v{font-family:"JetBrains Mono",monospace;font-size:12px;font-weight:600;text-align:right;}
+.stat-actions{display:flex;gap:6px;margin-top:10px;}
+.stat-btn{
+  flex:1;font-size:11.5px;font-weight:600;padding:7px 8px;border-radius:7px;
+  border:1px solid var(--line-strong);background:var(--paper);color:var(--ink);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;
+}
+.stat-btn:hover{background:#eee9dc;}
+.stat-btn.primary{background:var(--hankyung);color:#fff;border-color:var(--hankyung);}
+.stat-btn.primary:hover{background:var(--hankyung-deep);}
+
+/* CSV download toast */
+.toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:var(--ink);color:#fff;padding:12px 20px;border-radius:10px;
+  font-size:13px;display:flex;align-items:center;gap:10px;
+  opacity:0;pointer-events:none;transition:all .25s;
+  z-index:200;box-shadow:0 8px 24px rgba(0,0,0,0.25);
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.toast .dot{width:7px;height:7px;border-radius:50%;background:var(--good);flex-shrink:0;}
+
+/* ===== Comment filter block ===== */
+.comment-block{
+  margin-top:40px;padding-top:24px;border-top:1px solid var(--line);
+}
+.comment-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px;}
+.comment-head h3{font-size:15px;font-weight:700;}
+.comment-filters{display:flex;gap:6px;flex-wrap:wrap;}
+.cfilter{
+  font-size:11.5px;font-weight:600;padding:6px 11px;border-radius:999px;
+  border:1px solid var(--line-strong);background:#fff;color:var(--ink-soft);cursor:pointer;
+}
+.cfilter.active{background:var(--ink);color:#fff;border-color:var(--ink);}
+.comment-item{
+  display:none;padding:13px 0;border-bottom:1px solid #efece4;font-size:13.5px;
+}
+.comment-item.show{display:block;}
+.comment-item .who{font-weight:700;font-size:12.5px;margin-bottom:3px;display:flex;gap:6px;align-items:center;}
+.expert-badge{
+  font-size:10px;font-weight:700;background:var(--tag-bg);color:var(--hankyung-deep);
+  padding:2px 7px;border-radius:5px;
+}
+
+/* ===== Floating AI button (IDEA 06) ===== */
+.float-ai-btn{
+  position:absolute;right:24px;bottom:30px;
+  width:54px;height:54px;border-radius:16px;
+  background:var(--ink);color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;box-shadow:var(--shadow);
+  font-size:21px;
+  transition:transform .15s;
+  border:none;
+  z-index:30;
+}
+.float-ai-btn:hover{transform:scale(1.06);}
+.float-ai-btn .pulse{
+  position:absolute;inset:-4px;border-radius:20px;border:2px solid var(--hankyung);
+  opacity:.5;animation:pulse 2.4s ease-out infinite;
+}
+@media (prefers-reduced-motion: no-preference){
+  @keyframes pulse{0%{transform:scale(0.92);opacity:.6;}70%{transform:scale(1.25);opacity:0;}100%{opacity:0;}}
+}
+
+/* ===== AI Drag Panel (IDEA 06) ===== */
+.ai-panel{
+  position:fixed;
+  width:340px;
+  background:#fff;border:1px solid var(--line-strong);border-radius:14px;
+  box-shadow:0 16px 48px rgba(20,23,28,0.28);
+  z-index:300;
+  display:none;
+  overflow:hidden;
+}
+.ai-panel.open{display:flex;flex-direction:column;}
+.ai-panel-head{
+  background:var(--ink);color:#fff;padding:12px 14px;
+  display:flex;align-items:center;justify-content:space-between;
+  cursor:grab;user-select:none;
+}
+.ai-panel-head.dragging{cursor:grabbing;}
+.ai-panel-title{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;}
+.ai-dot{width:7px;height:7px;border-radius:50%;background:#7fe0b8;}
+.ai-close{
+  background:none;border:none;color:#fff;opacity:.7;cursor:pointer;font-size:16px;
+  width:22px;height:22px;display:flex;align-items:center;justify-content:center;
+}
+.ai-close:hover{opacity:1;}
+.ai-panel-body{padding:14px;font-size:13px;max-height:420px;overflow-y:auto;}
+.ai-prompt-row{
+  display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;
+}
+.ai-chip{
+  font-size:11.5px;font-weight:600;padding:6px 10px;border-radius:999px;
+  background:var(--tag-bg);color:var(--hankyung-deep);cursor:pointer;border:none;
+}
+.ai-chip:hover{background:#dee6f3;}
+.ai-result{
+  border-top:1px solid var(--line);padding-top:12px;margin-top:8px;
+}
+.ai-result h4{font-size:12.5px;margin-bottom:8px;}
+.ai-row{display:flex;justify-content:space-between;padding:6px 0;font-size:12.5px;border-bottom:1px solid #f3f1ea;}
+.ai-row:last-child{border-bottom:none;}
+.ai-row .lbl{color:var(--ink-soft);}
+.ai-row .num{font-family:"JetBrains Mono",monospace;font-weight:600;}
+.ai-verdict{
+  margin-top:10px;padding:10px 12px;border-radius:8px;background:#eaf6ef;
+  color:var(--good);font-size:12.5px;font-weight:600;display:flex;gap:8px;align-items:flex-start;
+}
+.ai-loading{display:flex;align-items:center;gap:8px;color:var(--ink-soft);font-size:12.5px;padding:10px 0;}
+.spinner{
+  width:13px;height:13px;border-radius:50%;border:2px solid var(--line-strong);
+  border-top-color:var(--hankyung);
+}
+@media (prefers-reduced-motion: no-preference){
+  .spinner{animation:spin .7s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+}
+.ai-gate{
+  text-align:center;padding:18px 6px 6px;
+}
+.ai-gate p{font-size:12.5px;color:var(--ink-soft);margin-bottom:12px;line-height:1.6;}
+.ai-gate-btn{
+  background:var(--hankyung);color:#fff;border:none;border-radius:8px;
+  padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;width:100%;
+}
+.ai-gate-btn:hover{background:var(--hankyung-deep);}
+
+/* ===== Subscription page (IDEA 05) ===== */
+.sub-overlay{
+  position:fixed;inset:0;background:rgba(15,17,20,0.55);
+  z-index:400;display:none;
+  align-items:flex-start;justify-content:center;
+  overflow-y:auto;padding:40px 16px;
+}
+.sub-overlay.open{display:flex;}
+.sub-modal{
+  background:var(--paper);border-radius:18px;max-width:720px;width:100%;
+  box-shadow:0 24px 64px rgba(0,0,0,0.35);
+  overflow:hidden;
+}
+.sub-modal-head{
+  padding:26px 28px 18px;border-bottom:1px solid var(--line);
+  display:flex;justify-content:space-between;align-items:flex-start;
+}
+.sub-modal-head h2{font-family:"Noto Serif KR",serif;font-size:21px;font-weight:800;margin-bottom:6px;}
+.sub-modal-head p{font-size:13px;color:var(--ink-soft);}
+.sub-x{
+  background:none;border:none;font-size:18px;color:var(--ink-soft);cursor:pointer;
+  width:30px;height:30px;flex-shrink:0;
+}
+.sub-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:14px;
+  padding:22px 28px 10px;
+}
+@media (max-width:640px){.sub-grid{grid-template-columns:1fr;}}
+.sub-card{
+  background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px 16px;
+  display:flex;flex-direction:column;gap:10px;
+}
+.sub-card.featured{border:2px solid var(--hankyung);}
+.sub-card .badge{
+  font-size:10.5px;font-weight:700;color:var(--hankyung-deep);background:var(--tag-bg);
+  padding:3px 8px;border-radius:5px;align-self:flex-start;
+}
+.sub-card .name{font-size:14.5px;font-weight:700;}
+.sub-card .price{font-family:"JetBrains Mono",monospace;font-size:20px;font-weight:700;}
+.sub-card .price span{font-size:11px;font-weight:400;color:var(--ink-soft);}
+.sub-feat{font-size:12px;color:var(--ink-soft);line-height:1.7;list-style:none;}
+.sub-feat li{padding-left:16px;position:relative;}
+.sub-feat li::before{content:"✓";position:absolute;left:0;color:var(--good);font-weight:700;}
+.sub-feat li.no::before{content:"–";color:var(--line-strong);}
+.sub-cta{
+  margin-top:auto;border:none;border-radius:8px;padding:10px;font-size:12.5px;font-weight:700;
+  cursor:pointer;background:var(--paper-2);color:var(--ink);
+}
+.sub-card.featured .sub-cta{background:var(--hankyung);color:#fff;}
+.sub-card.featured .sub-cta:hover{background:var(--hankyung-deep);}
+.sub-foot{
+  padding:14px 28px 24px;font-size:11.5px;color:var(--ink-soft);
+  border-top:1px solid var(--line);margin-top:8px;
+}
+
+/* ===== Annotation callouts (explaining idea linkage, only in this POC) ===== */
+.idea-tag{
+  position:absolute;
+  font-family:"JetBrains Mono",monospace;font-size:10.5px;font-weight:700;
+  background:var(--ink);color:#fff;padding:3px 8px;border-radius:6px;
+  z-index:20;pointer-events:none;
+}
+
+.sr-only{
+  position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
+  clip:rect(0,0,0,0);white-space:nowrap;border:0;
+}
+</style>
+</head>
+<body>
+
+<div class="poc-frame">
+
+  <div class="poc-banner">
+    <span>POC · 페르소나 — 조기원 (현업 활용·커뮤니티 검증형) · IDEA 04 / 06 / 05</span>
+    <span class="tag" id="stepLabel">1 / 4</span>
+  </div>
+
+  <div class="step-rail">
+    <button class="step-pill active" data-step="0"><span class="n">1</span>기사 진입</button>
+    <button class="step-pill" data-step="1"><span class="n">2</span>IDEA 04 — 캡션·CSV</button>
+    <button class="step-pill" data-step="2"><span class="n">3</span>IDEA 06 — 에픽AI 연계</button>
+    <button class="step-pill" data-step="3"><span class="n">4</span>IDEA 05 — 구독 통합</button>
+  </div>
+
+  <div class="masthead">
+    <div class="logo">한국경제</div>
+    <div class="masthead-right">
+      <span class="easy-badge">쉬운 모드 켜짐</span>
+      <div class="easy-toggle">
+        <span class="lbl">쉬운 모드</span>
+        <label class="easy-switch">
+          <input type="checkbox" id="easyToggle" aria-label="쉬운 모드 켜고 끄기">
+          <span class="track"></span>
+          <span class="knob"></span>
+        </label>
+      </div>
+      <div class="date mono">2026.06.24 · 증권</div>
+    </div>
+  </div>
+
+  <div class="article-wrap">
+
+    <div class="mode-normal">
+      <div class="kicker">반도체 · 실적</div>
+      <h1 class="headline">국내 반도체 3사, 2분기 영업이익 동반 증가 — 메모리 가격 회복 영향</h1>
+      <div class="byline">
+        <span>김도윤 기자</span>
+        <span class="mono">2026.06.24 16:02</span>
+      </div>
+
+      <p class="lede">
+        국내 주요 반도체 기업들의 2분기 영업이익이 메모리 가격 회복에 힘입어 일제히 증가했다.
+        업계는 하반기 들어 가격 상승세가 본격화될 것으로 전망하고 있다.
+      </p>
+
+      <p class="body-text">
+        삼성전자의 반도체 부문 영업이익은 전 분기 대비
+        <span class="stat-inline" data-stat="1" tabindex="0" role="button" aria-haspopup="true">18.4% 증가</span>한
+        것으로 잠정 집계됐다. DDR5 가격 상승과 서버용 메모리 수요 확대가 주요 요인으로 꼽힌다.
+      </p>
+
+      <p class="body-text">
+        SK하이닉스 역시 D램 평균판매가격(ASP)이
+        <span class="stat-inline" data-stat="2" tabindex="0" role="button" aria-haspopup="true">전 분기 대비 9.2% 상승</span>하며
+        실적 개선에 기여했다. 고대역폭메모리(HBM) 매출 비중 확대도 긍정적 요인으로 분석된다.
+      </p>
+
+      <p class="body-text">
+        업계 관계자는 "하반기 메모리 가격 상승세가 지속될 경우
+        <span class="stat-inline" data-stat="3" tabindex="0" role="button" aria-haspopup="true">연간 영업이익률 12% 이상</span>
+        달성이 가능할 것"이라고 내다봤다.
+      </p>
+    </div>
+
+    <div class="mode-easy">
+      <div class="kicker">쉬운 뉴스</div>
+      <h1 class="easy-headline">반도체를 만드는 회사들이 돈을 더 많이 벌고 있어요</h1>
+      <div class="byline">
+        <span>김도윤 기자</span>
+        <span class="mono">2026.06.24 16:02</span>
+        <span>· 쉽게 풀어 쓴 기사</span>
+      </div>
+
+      <p class="easy-lede">
+        삼성전자, SK하이닉스 같은 반도체 회사들이 요즘 돈을 더 많이 벌고 있어요.
+        반도체는 컴퓨터와 스마트폰 속에서 두뇌 역할을 하는 아주 작은 부품이에요.
+        이 부품의 가격이 다시 오르고 있어서, 회사들이 전보다 더 많은 돈을 남기고 있답니다.
+      </p>
+
+      <p class="easy-body">
+        삼성전자는 반도체를 팔아서 남긴 돈이 지난 3개월보다
+        <span class="stat-inline" data-stat="1" tabindex="0" role="button" aria-haspopup="true">18.4%나 더 늘었어요</span>.
+        '영업이익'이란 회사가 물건을 팔고 나서 진짜로 남긴 돈을 말해요.
+        더 빠른 메모리인 'DDR5'의 가격이 오르고, 큰 컴퓨터에 들어가는 메모리도 많이 팔린 게 이유예요.
+      </p>
+
+      <p class="easy-body">
+        SK하이닉스도 'D램'이라는 메모리를
+        <span class="stat-inline" data-stat="2" tabindex="0" role="button" aria-haspopup="true">지난번보다 9.2% 더 비싸게 팔았어요</span>.
+        인공지능 컴퓨터에 꼭 필요한 고급 메모리인 'HBM'도 많이 팔려서 회사가 돈을 더 벌었답니다.
+      </p>
+
+      <p class="easy-body">
+        한 전문가는 "메모리 가격이 계속 오르면 올해는
+        <span class="stat-inline" data-stat="3" tabindex="0" role="button" aria-haspopup="true">번 돈의 12% 이상을 진짜 이익으로</span>
+        남길 수 있을 것"이라고 말했어요. 다만 이 숫자는 아직 확실하지 않은 예상이에요.
+      </p>
+
+      <div class="glossary-box">
+        <h4>이런 말이 어려웠나요?</h4>
+        <div class="glossary-list">
+          <div class="glossary-item"><span class="glossary-term">영업이익</span><span class="glossary-def">회사가 물건을 팔고 나서, 여러 비용을 다 빼고 진짜로 남긴 돈</span></div>
+          <div class="glossary-item"><span class="glossary-term">반도체</span><span class="glossary-def">컴퓨터·스마트폰 안에서 생각하고 기억하는 일을 하는 아주 작은 부품</span></div>
+          <div class="glossary-item"><span class="glossary-term">D램</span><span class="glossary-def">컴퓨터가 잠깐 동안 정보를 기억해두는 메모리의 한 종류</span></div>
+          <div class="glossary-item"><span class="glossary-term">HBM</span><span class="glossary-def">인공지능 컴퓨터에 쓰이는, 더 빠르고 똑똑한 고급 메모리</span></div>
+          <div class="glossary-item"><span class="glossary-term">ASP</span><span class="glossary-def">제품 하나를 평균적으로 얼마에 팔았는지 보여주는 가격</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="comment-block">
+      <div class="comment-head">
+        <h3>댓글 142</h3>
+        <div class="comment-filters">
+          <button class="cfilter active" data-cfilter="all">전체</button>
+          <button class="cfilter" data-cfilter="expert">세무사 의견만</button>
+          <button class="cfilter" data-cfilter="accounting">회계 업종만</button>
+        </div>
+      </div>
+
+      <div class="comment-item show" data-tag="all">
+        <div class="who">익명123</div>
+        반도체 다시 살아나는 느낌이네요. 관련주 더 사야하나
+      </div>
+      <div class="comment-item show" data-tag="all expert accounting">
+        <div class="who">세무사_박정훈 <span class="expert-badge">세무사 인증</span></div>
+        영업이익률 12% 가정은 D램 가격 추가 상승을 전제로 한 거라 보수적으로 봐야 합니다. 법인세 효과까지 고려하면 실제 순이익 증가율은 이보다 낮을 가능성이 큽니다.
+      </div>
+      <div class="comment-item show" data-tag="all">
+        <div class="who">주식초보김</div>
+        그래서 사야된다는건지 말아야된다는건지 ㅋㅋ
+      </div>
+      <div class="comment-item show" data-tag="all accounting">
+        <div class="who">회계_이수민 <span class="expert-badge">회계 업종</span></div>
+        ASP 9.2% 상승은 전 분기 기저효과도 일부 있어서, 분기별 추세를 같이 봐야 정확한 해석이 됩니다.
+      </div>
+
+      <div class="ai-pop-anchor" style="position:relative;">
+        <button class="float-ai-btn" id="aiFloatBtn" aria-label="에픽AI 호출">
+          <span class="pulse" aria-hidden="true"></span>
+          <i aria-hidden="true">AI</i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="csvToast"><span class="dot"></span><span id="toastMsg">반도체_3사_2분기_실적.csv 다운로드 완료</span></div>
+
+<div class="ai-panel" id="aiPanel">
+  <div class="ai-panel-head" id="aiPanelHead">
+    <div class="ai-panel-title"><span class="ai-dot"></span>에픽AI · 기사 연계 분석</div>
+    <button class="ai-close" id="aiClose" aria-label="닫기">✕</button>
+  </div>
+  <div class="ai-panel-body" id="aiPanelBody">
+    <div class="ai-prompt-row">
+      <button class="ai-chip" data-prompt="cross">사업보고서 교차검증</button>
+      <button class="ai-chip" data-prompt="asset">내 자산 영향 분석</button>
+    </div>
+    <div id="aiContent" style="font-size:12.5px;color:var(--ink-soft);">
+      기사 본문에서 궁금한 항목을 선택하면, 에픽AI가 사업보고서·통계 원본과 교차검증합니다.
+    </div>
+  </div>
+</div>
+
+<div class="sub-overlay" id="subOverlay">
+  <div class="sub-modal">
+    <div class="sub-modal-head">
+      <div>
+        <h2>유료 서비스 한눈에 보기</h2>
+        <p>한경 콘텐츠와 한경 에픽AI를 가치 중심으로 비교해보세요</p>
+      </div>
+      <button class="sub-x" id="subClose" aria-label="닫기">✕</button>
+    </div>
+    <div class="sub-grid">
+      <div class="sub-card">
+        <span class="badge">무료</span>
+        <div class="name">기본 구독</div>
+        <div class="price">0원<span>/월</span></div>
+        <ul class="sub-feat">
+          <li>기사 무제한 열람</li>
+          <li>출처·기준시각 캡션</li>
+          <li>CSV 데이터 다운로드</li>
+          <li class="no">에픽AI 교차검증</li>
+          <li class="no">전문가 의견 필터</li>
+        </ul>
+        <button class="sub-cta" id="subStayFree">현재 플랜 유지</button>
+      </div>
+      <div class="sub-card featured">
+        <span class="badge">추천</span>
+        <div class="name">프리미엄 9 + 에픽AI</div>
+        <div class="price">29,000원<span>/월</span></div>
+        <ul class="sub-feat">
+          <li>프리미엄 기사 무제한</li>
+          <li>에픽AI 인앱 교차검증</li>
+          <li>내 자산 영향 분석</li>
+          <li>업종별 전문가 댓글 필터</li>
+          <li>전문가 Q&A 스레드</li>
+        </ul>
+        <button class="sub-cta" id="subUpgrade">통합 플랜 시작</button>
+      </div>
+      <div class="sub-card">
+        <span class="badge">개별</span>
+        <div class="name">에픽AI 단독</div>
+        <div class="price">19,000원<span>/월</span></div>
+        <ul class="sub-feat">
+          <li>에픽AI 인앱 교차검증</li>
+          <li>내 자산 영향 분석</li>
+          <li class="no">프리미엄 기사</li>
+          <li class="no">전문가 댓글 필터</li>
+        </ul>
+        <button class="sub-cta">에픽AI만 구독</button>
+      </div>
+    </div>
+    <div class="sub-foot">모든 유료 상품을 한 화면에서 비교 — 어떤 조합이 필요한지 가격·혜택을 그리드로 한눈에 확인할 수 있습니다.</div>
+  </div>
+</div>
+
+<script>
+const stats = {
+  1: {label:"삼성전자 반도체 영업이익 증가율", unit:"%, 전 분기 대비", basis:"2026.06.24 09:00 기준", source:"잠정실적 공시", csv:"삼성전자_영업이익_2Q.csv",
+      easyLabel:"삼성전자가 더 번 돈의 비율", easyUnit:"지난 3개월과 비교한 숫자"},
+  2: {label:"SK하이닉스 D램 ASP 상승률", unit:"%, 전 분기 대비", basis:"2026.06.23 18:00 기준", source:"한경 산업DB", csv:"SK하이닉스_DRAM_ASP.csv",
+      easyLabel:"메모리를 더 비싸게 판 정도", easyUnit:"지난 3개월과 비교한 숫자"},
+  3: {label:"업계 전망 연간 영업이익률", unit:"%, 가정치", basis:"2026.06.24 16:00 기준", source:"업계 관계자 인터뷰", csv:"반도체_영업이익률_전망.csv",
+      easyLabel:"올해 예상되는 이익 비율", easyUnit:"아직 확실하지 않은 예상 숫자"}
+};
+
+document.querySelectorAll('.stat-inline').forEach(el=>{
+  const id = el.dataset.stat;
+  const s = stats[id];
+  const isEasy = !!el.closest('.mode-easy');
+  const pop = document.createElement('div');
+  pop.className = 'stat-popover';
+  pop.innerHTML = `
+    <div class="stat-popover-row"><span class="k">지표</span><span class="v">${isEasy ? s.easyLabel : s.label}</span></div>
+    <div class="stat-popover-row"><span class="k">${isEasy ? '무슨 숫자' : '단위'}</span><span class="v">${isEasy ? s.easyUnit : s.unit}</span></div>
+    <div class="stat-popover-row"><span class="k">기준시각</span><span class="v">${s.basis}</span></div>
+    <div class="stat-popover-row"><span class="k">출처</span><span class="v">${s.source}</span></div>
+    <div class="stat-actions">
+      <button class="stat-btn" data-action="source">원문 보기</button>
+      <button class="stat-btn primary" data-action="csv" data-csv="${s.csv}">CSV 다운로드</button>
+    </div>
+  `;
+  el.appendChild(pop);
+
+  el.addEventListener('click', (e)=>{
+    if(e.target.closest('.stat-btn')) return;
+    document.querySelectorAll('.stat-inline.open').forEach(o=>{ if(o!==el) o.classList.remove('open'); });
+    el.classList.toggle('open');
+  });
+});
+
+document.addEventListener('click', (e)=>{
+  const btn = e.target.closest('.stat-btn');
+  if(btn && btn.dataset.action === 'csv'){
+    showToast(btn.dataset.csv + ' 다운로드 완료');
+  } else if(btn && btn.dataset.action === 'source'){
+    showToast('원본 통계 페이지로 이동 (데모)');
+  } else if(!e.target.closest('.stat-inline')){
+    document.querySelectorAll('.stat-inline.open').forEach(o=>o.classList.remove('open'));
+  }
+});
+
+const easyToggle = document.getElementById('easyToggle');
+easyToggle.addEventListener('change', ()=>{
+  document.querySelectorAll('.stat-inline.open').forEach(o=>o.classList.remove('open'));
+  document.body.classList.toggle('easy-on', easyToggle.checked);
+  showToast(easyToggle.checked ? '쉬운 모드로 전환했어요' : '원문 모드로 돌아왔어요');
+});
+
+function showToast(msg){
+  const t = document.getElementById('csvToast');
+  document.getElementById('toastMsg').textContent = msg;
+  t.classList.add('show');
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(()=> t.classList.remove('show'), 2400);
+}
+
+document.querySelectorAll('.cfilter').forEach(f=>{
+  f.addEventListener('click', ()=>{
+    document.querySelectorAll('.cfilter').forEach(x=>x.classList.remove('active'));
+    f.classList.add('active');
+    const tag = f.dataset.cfilter;
+    document.querySelectorAll('.comment-item').forEach(c=>{
+      const tags = c.dataset.tag.split(' ');
+      c.classList.toggle('show', tags.includes(tag));
+    });
+  });
+});
+
+const aiPanel = document.getElementById('aiPanel');
+const aiFloatBtn = document.getElementById('aiFloatBtn');
+const aiClose = document.getElementById('aiClose');
+const aiPanelHead = document.getElementById('aiPanelHead');
+const aiContent = document.getElementById('aiContent');
+let aiSubscribed = false;
+
+function positionPanelNearButton(){
+  const r = aiFloatBtn.getBoundingClientRect();
+  let left = r.left - 360;
+  let top = r.top - 200;
+  if(left < 16) left = Math.min(window.innerWidth - 356, 16);
+  if(top < 16) top = 16;
+  aiPanel.style.left = left + 'px';
+  aiPanel.style.top = top + 'px';
+}
+
+aiFloatBtn.addEventListener('click', ()=>{
+  positionPanelNearButton();
+  aiPanel.classList.add('open');
+});
+aiClose.addEventListener('click', ()=> aiPanel.classList.remove('open'));
+
+document.querySelectorAll('.ai-chip').forEach(chip=>{
+  chip.addEventListener('click', ()=>{
+    const kind = chip.dataset.prompt;
+    if(!aiSubscribed){
+      aiContent.innerHTML = `
+        <div class="ai-gate">
+          <p>사업보고서 교차검증과 내 자산 영향 분석은 한경 에픽AI 구독자에게 제공되는 기능입니다.</p>
+          <button class="ai-gate-btn" id="aiGateBtn">구독 옵션 보기</button>
+        </div>`;
+      document.getElementById('aiGateBtn').addEventListener('click', openSub);
+      return;
+    }
+    runAI(kind);
+  });
+});
+
+function runAI(kind){
+  aiContent.innerHTML = `<div class="ai-loading"><span class="spinner"></span>사업보고서·통계 원본 대조 중…</div>`;
+  setTimeout(()=>{
+    if(kind === 'cross'){
+      aiContent.innerHTML = `
+        <div class="ai-result">
+          <h4>사업보고서 교차검증 결과</h4>
+          <div class="ai-row"><span class="lbl">공시 영업이익 증가율</span><span class="num">18.4%</span></div>
+          <div class="ai-row"><span class="lbl">최근 4개 분기 평균</span><span class="num">11.7%</span></div>
+          <div class="ai-row"><span class="lbl">전년 동기 대비</span><span class="num">+22.1%</span></div>
+          <div class="ai-verdict">기사 수치는 공시자료와 일치합니다. 다만 4개 분기 평균보다 높아 일시적 호조 가능성도 함께 고려할 필요가 있습니다.</div>
+        </div>`;
+    } else {
+      aiContent.innerHTML = `
+        <div class="ai-result">
+          <h4>내 자산 영향 분석 (회계 사무원 · 53세 기준)</h4>
+          <div class="ai-row"><span class="lbl">관련 종목 보유 가정 수익률</span><span class="num">+4.2%p</span></div>
+          <div class="ai-row"><span class="lbl">반도체 섹터 비중 권고</span><span class="num">중립~소폭 확대</span></div>
+          <div class="ai-verdict">현재 보유 비중이 낮다면 단기 추격 매수보다 분기 실적 확인 후 점진 진입이 적합합니다.</div>
+        </div>`;
+    }
+  }, 900);
+}
+
+let dragState = null;
+aiPanelHead.addEventListener('pointerdown', (e)=>{
+  const rect = aiPanel.getBoundingClientRect();
+  dragState = { offX: e.clientX - rect.left, offY: e.clientY - rect.top };
+  aiPanelHead.classList.add('dragging');
+  aiPanelHead.setPointerCapture(e.pointerId);
+});
+aiPanelHead.addEventListener('pointermove', (e)=>{
+  if(!dragState) return;
+  let left = e.clientX - dragState.offX;
+  let top = e.clientY - dragState.offY;
+  left = Math.max(8, Math.min(window.innerWidth - 348, left));
+  top = Math.max(8, Math.min(window.innerHeight - 60, top));
+  aiPanel.style.left = left + 'px';
+  aiPanel.style.top = top + 'px';
+});
+['pointerup','pointercancel'].forEach(ev=>{
+  aiPanelHead.addEventListener(ev, ()=>{
+    dragState = null;
+    aiPanelHead.classList.remove('dragging');
+  });
+});
+
+const subOverlay = document.getElementById('subOverlay');
+function openSub(){ subOverlay.classList.add('open'); }
+document.getElementById('subClose').addEventListener('click', ()=> subOverlay.classList.remove('open'));
+subOverlay.addEventListener('click', (e)=>{ if(e.target === subOverlay) subOverlay.classList.remove('open'); });
+document.getElementById('subStayFree').addEventListener('click', ()=> subOverlay.classList.remove('open'));
+document.getElementById('subUpgrade').addEventListener('click', ()=>{
+  aiSubscribed = true;
+  subOverlay.classList.remove('open');
+  showToast('프리미엄 9 + 에픽AI 구독 완료');
+  aiContent.innerHTML = `에픽AI 구독이 활성화되었습니다. 위 칩을 다시 눌러 분석을 실행해보세요.`;
+});
+
+const stepRail = document.querySelectorAll('.step-pill');
+const stepLabel = document.getElementById('stepLabel');
+const stepActions = {
+  0: ()=>{
+    document.querySelectorAll('.stat-inline.open').forEach(o=>o.classList.remove('open'));
+    aiPanel.classList.remove('open');
+    subOverlay.classList.remove('open');
+  },
+  1: ()=>{
+    aiPanel.classList.remove('open');
+    subOverlay.classList.remove('open');
+    document.querySelectorAll('.stat-inline.open').forEach(o=>o.classList.remove('open'));
+    const scope = document.body.classList.contains('easy-on') ? '.mode-easy' : '.mode-normal';
+    const target = document.querySelector(scope + ' [data-stat="1"]');
+    target.classList.add('open');
+    target.scrollIntoView({behavior:'smooth', block:'center'});
+  },
+  2: ()=>{
+    document.querySelectorAll('.stat-inline.open').forEach(o=>o.classList.remove('open'));
+    subOverlay.classList.remove('open');
+    aiFloatBtn.scrollIntoView({behavior:'smooth', block:'center'});
+    setTimeout(()=>{ positionPanelNearButton(); aiPanel.classList.add('open'); }, 350);
+  },
+  3: ()=>{
+    aiPanel.classList.remove('open');
+    openSub();
+  }
+};
+stepRail.forEach(p=>{
+  p.addEventListener('click', ()=>{
+    stepRail.forEach(x=>x.classList.remove('active'));
+    p.classList.add('active');
+    const idx = p.dataset.step;
+    stepLabel.textContent = (parseInt(idx)+1) + ' / 4';
+    stepActions[idx]();
+  });
+});
+</script>
+
+</body>
+</html>
