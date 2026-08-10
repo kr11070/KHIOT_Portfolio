@@ -1,11 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { dict, pick, useLang } from "@/lib/i18n";
 import { fallbackSideProjects, getSideProjects, mainProjects, type Project } from "@/lib/portfolio-data";
-import AddProjectCard from "./AddProjectCard";
-import DeleteProjectButton from "./DeleteProjectButton";
-import EditProjectButton from "./EditProjectButton";
 import ProjectCard from "./ProjectCard";
 import Reveal from "./Reveal";
 
@@ -47,10 +44,6 @@ export function SideProjects() {
   const { lang } = useLang();
   const [sideProjects, setSideProjects] = useState<Project[]>(fallbackSideProjects);
   const [sortByDate, setSortByDate] = useState(false);
-
-  const reload = useCallback(() => {
-    getSideProjects().then(setSideProjects);
-  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -96,15 +89,10 @@ export function SideProjects() {
       {/* 사이드 프로젝트: 3열 카드 그리드 */}
       <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {displayedProjects.map((project, i) => (
-          <Reveal key={project.slug} delay={i * 100} className="relative h-full">
+          <Reveal key={project.slug} delay={i * 100} className="h-full">
             <ProjectCard project={project} compact />
-            <EditProjectButton project={project} onUpdated={reload} />
-            <DeleteProjectButton project={project} onDeleted={reload} />
           </Reveal>
         ))}
-        <Reveal delay={sideProjects.length * 100} className="h-full">
-          <AddProjectCard onAdded={reload} />
-        </Reveal>
       </div>
     </section>
   );
