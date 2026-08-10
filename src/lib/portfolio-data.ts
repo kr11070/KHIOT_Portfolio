@@ -187,6 +187,24 @@ export async function deleteSideProject(
  */
 export const mainProjects: Project[] = [
   {
+    slug: "agile-squad",
+    title: {
+      ko: "Agile Squad — 한경 뉴스 리딩 경험 개선",
+      en: "Agile Squad — Hankyung News Reading Experience",
+      ja: "Agile Squad — 韓経ニュース読書体験の改善",
+    },
+    description: {
+      ko: "2030 신규 사용자를 위한 경제 뉴스 앱 UX/UI. 사용자 리서치부터 읽기 난이도 슬라이더가 있는 인터랙티브 프로토타입까지 팀으로 완성했습니다.",
+      en: "Economic-news app UX/UI for young readers — from user research to an interactive prototype with a reading-level slider, built as a scrum team.",
+      ja: "20〜30代の新規ユーザー向け経済ニュースアプリのUX/UI。ユーザーリサーチから読みやすさスライダー付きプロトタイプまでチームで完成させました。",
+    },
+    tech: ["Figma", "UX Research", "Agile Scrum", "React", "Vite"],
+    links: {
+      caseStudy: "/case-studies/agile-squad",
+      github: "https://github.com/kr11070/News_easymode.git",
+    },
+  },
+  {
     slug: "group-act",
     title: {
       ko: "Group Act — AI 기반 경제 뉴스 학습 경험 개선",
