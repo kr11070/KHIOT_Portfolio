@@ -201,6 +201,7 @@ export const mainProjects: Project[] = [
     tech: ["Figma", "UX Research", "Agile Scrum", "React", "Vite"],
     links: {
       caseStudy: "/case-studies/agile-squad",
+      demo: "https://agileserver.netlify.app",
       github: "https://github.com/kr11070/News_easymode.git",
     },
   },
