@@ -199,6 +199,7 @@ export const mainProjects: Project[] = [
       ja: "20〜30代の新規ユーザー向け経済ニュースアプリのUX/UI。ユーザーリサーチから読みやすさスライダー付きプロトタイプまでチームで完成させました。",
     },
     tech: ["Figma", "UX Research", "Agile Scrum", "React", "Vite"],
+    date: "2026.06.19 – 2026.07.02",
     thumbnail: "/images/agile-squad/thumb.png",
     links: {
       caseStudy: "/case-studies/agile-squad",
@@ -219,6 +220,7 @@ export const mainProjects: Project[] = [
       ja: "紙の新聞で線を引きメモを取る読書体験をモバイルに拡張したAIベースの経済ニュース学習サービス「Papertory」。ハイライト要約、やさしい記事解説、ゲーム型コンテンツで経済ニュース初心者の参入障壁を下げるプロトタイプをチームで完成させました。",
     },
     tech: ["UX Research", "Figma", "React", "AI"],
+    date: "2026.07.03 – 2026.07.30",
     thumbnail: "/images/group-act/thumb.webp",
     links: {
       caseStudy: "/case-studies/group-act",
