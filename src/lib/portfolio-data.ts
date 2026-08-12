@@ -199,9 +199,10 @@ export const mainProjects: Project[] = [
       ja: "20〜30代の新規ユーザー向け経済ニュースアプリのUX/UI。ユーザーリサーチから読みやすさスライダー付きプロトタイプまでチームで完成させました。",
     },
     tech: ["Figma", "UX Research", "Agile Scrum", "React", "Vite"],
+    thumbnail: "/images/agile-squad/thumb.png",
     links: {
       caseStudy: "/case-studies/agile-squad",
-      demo: "https://agileserver.netlify.app",
+      demo: "https://hkaisproject.netlify.app",
       github: "https://github.com/kr11070/News_easymode.git",
     },
   },
@@ -218,6 +219,7 @@ export const mainProjects: Project[] = [
       ja: "紙の新聞で線を引きメモを取る読書体験をモバイルに拡張したAIベースの経済ニュース学習サービス「Papertory」。ハイライト要約、やさしい記事解説、ゲーム型コンテンツで経済ニュース初心者の参入障壁を下げるプロトタイプをチームで完成させました。",
     },
     tech: ["UX Research", "Figma", "React", "AI"],
+    thumbnail: "/images/group-act/thumb.webp",
     links: {
       caseStudy: "/case-studies/group-act",
       github: "https://github.com/kr11070/teamproject_groupact.git",
