@@ -242,6 +242,7 @@ export const fallbackSideProjects: Project[] = [
       ja: "ニュース記事をスライダーで原文/やさしい読み方の2段階に切り替え、外国語記事を韓国語に翻訳するChrome拡張。2026年8月のストア公開を目指しています。",
     },
     tech: ["Chrome Extension", "JavaScript", "Netlify Functions", "Groq API"],
+    thumbnail: "/images/news-reading-mode/thumb.webp",
     links: {
       github: "https://github.com/kr11070/News_easymode",
     },
