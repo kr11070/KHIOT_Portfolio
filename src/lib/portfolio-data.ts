@@ -517,20 +517,27 @@ export type Skill = {
   level: number;
 };
 
-/** Firestore 조회 실패 시 대체로 쓰이는 정적 목록. level 값은 예시이니 실제 역량에 맞게 자유롭게 수정하세요. */
+/**
+ * Firestore 조회 실패 시 대체로 쓰이는 정적 목록. level 값은 예시이니 실제 역량에 맞게 자유롭게 수정하세요.
+ * 2026.08 기준 게시된 프로젝트 내용(Figma 프로토타입, Claude/Gemini/Groq 활용 리포트·프로토타입,
+ * 데이터 분석 대시보드, 디자인 시스템, Chrome 확장 등)을 근거로 재정리했습니다.
+ */
 export const fallbackSkills: Skill[] = [
   { name: "Figma / FigJam", level: 90 },
-  { name: "UX Research", level: 80 },
-  { name: "Wireframing", level: 80 },
-  { name: "Prototyping", level: 75 },
-  { name: "Design System", level: 70 },
-  { name: "Jira", level: 60 },
+  { name: "UX Research", level: 85 },
+  { name: "AI 활용 (Claude · Gemini · Groq)", level: 90 },
+  { name: "Prototyping", level: 80 },
+  { name: "Design System", level: 80 },
+  { name: "Data Analytics", level: 75 },
+  { name: "Service Design", level: 75 },
   { name: "Agile Scrum", level: 65 },
-  { name: "HTML / CSS", level: 60 },
-  { name: "JavaScript", level: 50 },
-  { name: "React (기초)", level: 40 },
-  { name: "Chrome Extension", level: 45 },
-  { name: "AI 활용 (Groq API)", level: 55 },
+  { name: "Jira / GitHub", level: 60 },
+  { name: "JavaScript", level: 55 },
+  { name: "React (기초)", level: 50 },
+  { name: "Chrome Extension", level: 50 },
+  { name: "HTML / CSS", level: 50 },
+  { name: "Adobe Photoshop", level: 50 },
+  { name: "Adobe Illustrator", level: 50 },
 ];
 
 /**
