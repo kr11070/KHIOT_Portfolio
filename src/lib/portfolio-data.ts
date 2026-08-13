@@ -464,6 +464,25 @@ export const fallbackSideProjects: Project[] = [
       github: "https://github.com/kr11070/MusicPlayer_HereHear",
     },
   },
+  {
+    slug: "hankyung-eureka-design-system",
+    title: {
+      ko: "한경 유레카 디자인 시스템",
+      en: "Hankyung Eureka Design System",
+      ja: "韓経ユレカ デザインシステム",
+    },
+    description: {
+      ko: "한경 유레카 앱 캡처를 기반으로 컬러·타이포그래피·아이콘·그리드 디자인 시스템을 정립하고, Figma 라이브러리로 배포해 팀원과 함께 실제 화면 구성에 적용한 프로젝트입니다.",
+      en: "Built a color, typography, icon, and grid design system from Hankyung Eureka app screenshots, published it as a Figma library, and applied it to real screens together with teammates.",
+      ja: "韓経ユレカアプリのキャプチャを基にカラー・タイポグラフィ・アイコン・グリッドのデザインシステムを構築し、Figmaライブラリとして公開してチームメンバーと共に実際の画面構成に適用したプロジェクトです。",
+    },
+    tech: ["Design System", "Figma", "Figma Make", "AI"],
+    date: "2026.06.18",
+    thumbnail: "/images/hankyung-eureka-design-system/after.png",
+    links: {
+      caseStudy: "/case-studies/hankyung-eureka-design-system",
+    },
+  },
 ];
 
 export type Skill = {
