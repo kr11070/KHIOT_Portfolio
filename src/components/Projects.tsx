@@ -50,15 +50,34 @@ export function Projects() {
   );
 }
 
+/** 카드 데이터 로딩 중 보여줄 자리 표시자. fallback 카드가 실제 목록과 뒤바뀌는 느낌을 없애기 위해 씁니다. */
+function ProjectCardSkeleton() {
+  return (
+    <div className="flex h-full animate-pulse flex-col">
+      <div className="h-36 rounded-2xl bg-line" />
+      <div className="mt-4 flex flex-1 flex-col">
+        <div className="h-3 w-16 rounded bg-line" />
+        <div className="mt-2 border-t border-line" />
+        <div className="mt-3 h-5 w-3/4 rounded bg-line" />
+        <div className="mt-3 flex-1 space-y-2">
+          <div className="h-3 w-full rounded bg-line" />
+          <div className="h-3 w-5/6 rounded bg-line" />
+        </div>
+        <div className="mt-4 h-7 w-24 rounded-full bg-line" />
+      </div>
+    </div>
+  );
+}
+
 export function SideProjects() {
   const { lang } = useLang();
-  const [sideProjects, setSideProjects] = useState<Project[]>(fallbackSideProjects);
+  const [sideProjects, setSideProjects] = useState<Project[] | null>(null);
   const [sortByDate, setSortByDate] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
     getSideProjects().then((projects) => {
-      if (!cancelled) setSideProjects(projects);
+      if (!cancelled) setSideProjects(projects.length > 0 ? projects : fallbackSideProjects);
     });
     return () => {
       cancelled = true;
@@ -66,7 +85,7 @@ export function SideProjects() {
   }, []);
 
   const displayedProjects = useMemo(
-    () => (sortByDate ? sortByDateDesc(sideProjects) : sortByDateAsc(sideProjects)),
+    () => (sideProjects === null ? null : sortByDate ? sortByDateDesc(sideProjects) : sortByDateAsc(sideProjects)),
     [sideProjects, sortByDate]
   );
 
@@ -98,11 +117,13 @@ export function SideProjects() {
 
       {/* 사이드 프로젝트: 3열 카드 그리드 */}
       <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {displayedProjects.map((project, i) => (
-          <Reveal key={project.slug} delay={i * 100} className="h-full">
-            <ProjectCard project={project} compact />
-          </Reveal>
-        ))}
+        {displayedProjects === null
+          ? Array.from({ length: 6 }).map((_, i) => <ProjectCardSkeleton key={i} />)
+          : displayedProjects.map((project, i) => (
+              <Reveal key={project.slug} delay={i * 100} className="h-full">
+                <ProjectCard project={project} compact />
+              </Reveal>
+            ))}
       </div>
     </section>
   );
