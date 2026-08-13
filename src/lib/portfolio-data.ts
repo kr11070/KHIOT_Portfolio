@@ -1,4 +1,4 @@
-import { collection, deleteDoc, doc, getDocs, orderBy, query, serverTimestamp, setDoc, updateDoc } from "firebase/firestore";
+import { collection, deleteDoc, doc, getDoc, getDocs, orderBy, query, serverTimestamp, setDoc, updateDoc } from "firebase/firestore";
 import type { Lang } from "./i18n";
 import { auth, db } from "./firebase";
 
@@ -517,8 +517,8 @@ export type Skill = {
   level: number;
 };
 
-/** About 섹션 — 스킬 목록과 숙련도. level 값은 예시이니 실제 역량에 맞게 자유롭게 수정하세요. */
-export const skills: Skill[] = [
+/** Firestore 조회 실패 시 대체로 쓰이는 정적 목록. level 값은 예시이니 실제 역량에 맞게 자유롭게 수정하세요. */
+export const fallbackSkills: Skill[] = [
   { name: "Figma / FigJam", level: 90 },
   { name: "UX Research", level: 80 },
   { name: "Wireframing", level: 80 },
@@ -532,6 +532,41 @@ export const skills: Skill[] = [
   { name: "Chrome Extension", level: 45 },
   { name: "AI 활용 (Groq API)", level: 55 },
 ];
+
+/**
+ * 스킬 목록은 `side_projects` 컬렉션의 `_skills` 문서 하나에 저장합니다 (별도 컬렉션을 새로 만들면
+ * Firestore 보안 규칙도 새로 배포해야 해서, 이미 쓰기 권한이 열려 있는 컬렉션에 얹는 방식을 씁니다).
+ * `sortOrder` 필드가 없어서 `getSideProjects()`의 orderBy 쿼리에는 걸리지 않습니다.
+ */
+const SKILLS_DOC_PATH = ["side_projects", "_skills"] as const;
+
+export async function getSkills(): Promise<Skill[]> {
+  if (!db) return fallbackSkills;
+
+  try {
+    const snap = await getDoc(doc(db, ...SKILLS_DOC_PATH));
+    if (!snap.exists()) return fallbackSkills;
+    const items = snap.data().items as Skill[] | undefined;
+    return items && items.length > 0 ? items : fallbackSkills;
+  } catch {
+    return fallbackSkills;
+  }
+}
+
+/** 관리자 스킬 편집 폼에서 호출. 로그인된 관리자만 문서를 저장할 수 있습니다. */
+export async function updateSkills(
+  items: Skill[]
+): Promise<{ ok: true } | { ok: false; message: string }> {
+  if (!db || !auth) return { ok: false, message: "Firebase가 설정되지 않았습니다." };
+  if (!auth.currentUser) return { ok: false, message: "로그인이 필요해요." };
+
+  try {
+    await setDoc(doc(db, ...SKILLS_DOC_PATH), { items });
+    return { ok: true };
+  } catch (error) {
+    return { ok: false, message: `저장에 실패했어요: ${(error as Error).message}` };
+  }
+}
 
 export type ExperienceItem = {
   period: string;

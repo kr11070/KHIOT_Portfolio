@@ -1,11 +1,23 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { dict, pick, useLang } from "@/lib/i18n";
-import { experiences, skills } from "@/lib/portfolio-data";
+import { experiences, fallbackSkills, getSkills, type Skill } from "@/lib/portfolio-data";
 import Reveal from "./Reveal";
 
 export default function About() {
   const { lang } = useLang();
+  const [skills, setSkills] = useState<Skill[]>(fallbackSkills);
+
+  useEffect(() => {
+    let cancelled = false;
+    getSkills().then((s) => {
+      if (!cancelled) setSkills(s);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   return (
     <section id="about" className="mx-auto max-w-5xl scroll-mt-20 px-5 py-24">
