@@ -4,7 +4,7 @@ import { useState } from "react";
 import { updateSkills, type Skill } from "@/lib/portfolio-data";
 
 const inputCls =
-  "w-full rounded-xl border border-line bg-white px-3 py-2 text-sm text-ink outline-none transition-colors focus:border-accent-dark";
+  "rounded-xl border border-line bg-white px-3 py-2 text-sm text-ink outline-none transition-colors focus:border-accent-dark";
 
 /**
  * About 섹션의 "스킬 & 툴" 목록(이름 + 숙련도 %)을 편집하는 모달.
@@ -84,8 +84,8 @@ export default function SkillsFormModal({
           {items.length > 0 && (
             <div className="flex items-center gap-2 px-0.5 text-[11px] font-bold text-ink-faint">
               <span className="w-4 shrink-0" />
-              <span className="flex-1">스킬 이름</span>
-              <span className="w-20 shrink-0">숙련도</span>
+              <span className="min-w-0 flex-1">스킬 이름</span>
+              <span className="w-16 shrink-0">숙련도</span>
               <span className="w-4 shrink-0" />
               <span className="w-6 shrink-0" />
             </div>
@@ -113,13 +113,13 @@ export default function SkillsFormModal({
                 </button>
               </div>
               <input
-                className={`${inputCls} flex-1`}
+                className={`${inputCls} min-w-0 flex-1`}
                 value={item.name}
                 onChange={(e) => updateItem(i, { name: e.target.value })}
                 placeholder="예: Figma / FigJam"
               />
               <input
-                className={`${inputCls} w-20`}
+                className={`${inputCls} w-16 shrink-0`}
                 type="number"
                 min={0}
                 max={100}
