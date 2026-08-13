@@ -114,18 +114,13 @@ export default function ProjectCard({
         ) : (
           <ThumbPlaceholder slug={project.slug} title={title} />
         )}
-
-        {project.date && (
-          <span className="absolute left-3 top-3 rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-bold tracking-wide text-ink shadow-sm">
-            {project.date}
-          </span>
-        )}
       </Thumb>
 
       <div className="mt-4 flex flex-1 flex-col">
-        {category && (
-          <div className="text-[11px] font-bold uppercase tracking-widest text-ink-faint">
+        {(category || project.date) && (
+          <div className="flex items-center justify-between text-[11px] font-bold uppercase tracking-widest text-ink-faint">
             <span>{category}</span>
+            {project.date && <span className="normal-case tracking-wide">{project.date}</span>}
           </div>
         )}
         <div className="mt-2 border-t border-line" />
