@@ -1,10 +1,30 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, type ReactNode } from "react";
 import { dict, pick, useLang } from "@/lib/i18n";
 import type { Project } from "@/lib/portfolio-data";
 
 const VIDEO_THUMBNAIL_PATTERN = /\.(mp4|webm|mov)(\?.*)?$/i;
+
+/** 썸네일 래퍼 — 라이브 데모 링크가 있으면 클릭 시 새 탭으로 바로 이동 */
+function Thumb({
+  href,
+  className,
+  children,
+}: {
+  href?: string;
+  className: string;
+  children: ReactNode;
+}) {
+  if (href) {
+    return (
+      <a href={href} target="_blank" rel="noopener noreferrer" className={className}>
+        {children}
+      </a>
+    );
+  }
+  return <div className={className}>{children}</div>;
+}
 
 /** 썸네일이 없을 때 프로젝트 첫 글자로 만드는 그라데이션 플레이스홀더 */
 function ThumbPlaceholder({ slug, title }: { slug: string; title: string }) {
@@ -63,8 +83,11 @@ export default function ProjectCard({
         if (videoRef.current) videoRef.current.currentTime = 0;
       }}
     >
-      {/* 썸네일 */}
-      <div className={`relative overflow-hidden rounded-2xl ${compact ? "h-36" : "h-52"}`}>
+      {/* 썸네일 — 라이브 데모 링크가 있으면 클릭 시 바로 이동 */}
+      <Thumb
+        href={project.links.demo}
+        className={`relative overflow-hidden rounded-2xl ${compact ? "h-36" : "h-52"}`}
+      >
         {project.thumbnail ? (
           VIDEO_THUMBNAIL_PATTERN.test(project.thumbnail) ? (
             <video
@@ -92,15 +115,12 @@ export default function ProjectCard({
             {project.date}
           </span>
         )}
-      </div>
+      </Thumb>
 
       <div className="mt-4 flex flex-1 flex-col">
         {category && (
-          <div className="flex items-center justify-between text-[11px] font-bold uppercase tracking-widest text-ink-faint">
+          <div className="text-[11px] font-bold uppercase tracking-widest text-ink-faint">
             <span>{category}</span>
-            <span aria-hidden="true" className="transition-transform group-hover:translate-x-0.5">
-              →
-            </span>
           </div>
         )}
         <div className="mt-2 border-t border-line" />

@@ -227,6 +227,7 @@ export const mainProjects: Project[] = [
     thumbnail: "/images/group-act/thumb.webp",
     links: {
       caseStudy: "/case-studies/group-act",
+      demo: "https://papertory.com4nent.workers.dev/",
       github: "https://github.com/kr11070/teamproject_groupact.git",
     },
   },
