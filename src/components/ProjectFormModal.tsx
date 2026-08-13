@@ -13,6 +13,7 @@ export type ProjectFormValues = {
   tech: string;
   caseStudy: string;
   demo: string;
+  demoLabel: string;
   github: string;
   download: string;
 };
@@ -25,6 +26,7 @@ export const emptyProjectFormValues: ProjectFormValues = {
   tech: "",
   caseStudy: "",
   demo: "",
+  demoLabel: "",
   github: "",
   download: "",
 };
@@ -159,6 +161,17 @@ export default function ProjectFormModal({
               value={values.demo}
               onChange={(e) => set("demo", e.target.value)}
               placeholder="https://claude.ai/public/artifacts/…"
+            />
+          </label>
+
+          <label className="flex flex-col gap-1 text-xs font-bold text-ink-soft">
+            데모 버튼 라벨
+            <input
+              className={inputCls}
+              type="text"
+              value={values.demoLabel}
+              onChange={(e) => set("demoLabel", e.target.value)}
+              placeholder="비우면 '라이브 데모' (예: 리포트 보기, 대시보드 보기)"
             />
           </label>
 
