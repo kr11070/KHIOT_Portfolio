@@ -29,6 +29,7 @@ export default function EditProjectButton({
     date: project.date ?? "",
     thumbnail: project.thumbnail ?? "",
     tech: project.tech.join(", "),
+    caseStudy: project.links.caseStudy ?? "",
     demo: project.links.demo ?? "",
     github: project.links.github ?? "",
     download: project.links.download ?? "",
@@ -49,6 +50,7 @@ export default function EditProjectButton({
         .split(",")
         .map((t) => t.trim())
         .filter(Boolean),
+      caseStudy: values.caseStudy,
       demo: values.demo,
       github: values.github,
       download: values.download,
