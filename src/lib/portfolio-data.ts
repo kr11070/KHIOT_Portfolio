@@ -244,6 +244,7 @@ export const fallbackSideProjects: Project[] = [
       ja: "ニュース記事をスライダーで原文/やさしい読み方の2段階に切り替え、外国語記事を韓国語に翻訳するChrome拡張。2026年8月のストア公開を目指しています。",
     },
     tech: ["Chrome Extension", "JavaScript", "Netlify Functions", "Groq API"],
+    date: "2026.08.12",
     thumbnail: "/images/news-reading-mode/thumb.webp",
     links: {
       github: "https://github.com/kr11070/News_easymode",
@@ -262,7 +263,7 @@ export const fallbackSideProjects: Project[] = [
       ja: "ユーザーインタビュー1件から、サイズ情報の不正確さや色の歪み、レビューの信頼性不足など8つのペインポイントを導き出し、解決の優先順位を整理したUXリサーチレポートです。",
     },
     tech: ["UX Research", "User Interview", "Claude"],
-    date: "2026.04",
+    date: "2026.04.15",
     thumbnail: "https://ik.imagekit.io/dvkhncfzk/portfolio/fashionapp.webm",
     links: {
       demo: "https://claude.ai/public/artifacts/72008362-d10e-471e-92b3-80b040bba396",
@@ -281,7 +282,7 @@ export const fallbackSideProjects: Project[] = [
       ja: "競合ポジショニングとTAM/SAM/SOM市場規模、3年間の収益シナリオまでまとめた新規創業分析ダッシュボードです。",
     },
     tech: ["Market Research", "TAM/SAM/SOM", "Claude"],
-    date: "2026.07",
+    date: "2026.04.17",
     thumbnail: "https://ik.imagekit.io/dvkhncfzk/juheeproj/%EC%A4%91%EA%B3%A0%EA%B1%B0%EB%9E%98",
     links: {
       demo: "https://marketinsight.ai.studio",
@@ -300,7 +301,7 @@ export const fallbackSideProjects: Project[] = [
       ja: "責任を負わずにペットと触れ合えるマッチング・預かりプラットフォームの6ヶ月実行事業計画書。ソウル永登浦区を拠点に、シード3億ウォン、18ヶ月での損益分岐を市場データに基づいて設計しました。",
     },
     tech: ["Business Plan", "Market Research", "Claude"],
-    date: "2026.04",
+    date: "2026.04.21",
     thumbnail: "https://ik.imagekit.io/dvkhncfzk/juheeproj/pet.webm",
     links: {
       demo: "https://claude.ai/public/artifacts/395ba06b-8a10-47ac-8668-3e75cf6ddc56",
@@ -319,6 +320,7 @@ export const fallbackSideProjects: Project[] = [
       ja: "日本・台湾の昔ながらの喫茶店の感性から生まれたカラー・タイポグラフィのデザインシステム。Primitive → Semantic → Moleculeの3層構造で214個のトークンを構成し、ダークモードはPrimitiveの反転だけで切り替わります。",
     },
     tech: ["Design System", "Design Tokens", "Claude"],
+    date: "2026.05.14",
     thumbnail: "https://ik.imagekit.io/dvkhncfzk/juheeproj/%EB%94%94%EC%9E%90%EC%9D%B8%EC%8B%9C%EC%8A%A4%ED%85%9C",
     links: {
       demo: "https://claude.ai/public/artifacts/9f673cf7-a6ab-4807-879e-fbe8172ab2ef",
@@ -436,7 +438,7 @@ export const fallbackSideProjects: Project[] = [
       ja: "タイタニック号の乗客データを分析し、客室クラス・性別・年齢別の生存率をインタラクティブなチャートで可視化したデータ分析ダッシュボードです。",
     },
     tech: ["Data Analytics", "Data Visualization", "Dashboard"],
-    date: "2026.08",
+    date: "2026.04.20",
     thumbnail: "https://ik.imagekit.io/dvkhncfzk/juheeproj/%ED%83%80%EC%9D%B4%ED%83%80%EB%8B%89",
     links: {
       demo: "https://titanic-survivors-dashboard-223453858568.us-west1.run.app",
