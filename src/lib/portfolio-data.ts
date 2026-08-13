@@ -85,6 +85,7 @@ export type NewSideProject = {
   date?: string;
   thumbnail?: string;
   tech: string[];
+  caseStudy?: string;
   demo?: string;
   github?: string;
   download?: string;
@@ -123,6 +124,7 @@ export async function addSideProject(
       date: orNull(input.date),
       thumbnail: orNull(input.thumbnail),
       links: {
+        caseStudy: orNull(input.caseStudy),
         demo: orNull(input.demo),
         github: orNull(input.github),
         download: orNull(input.download),
@@ -153,6 +155,7 @@ export async function updateSideProject(
       tech: input.tech,
       date: orNull(input.date),
       thumbnail: orNull(input.thumbnail),
+      "links.caseStudy": orNull(input.caseStudy),
       "links.demo": orNull(input.demo),
       "links.github": orNull(input.github),
       "links.download": orNull(input.download),

@@ -11,6 +11,7 @@ export type ProjectFormValues = {
   date: string;
   thumbnail: string;
   tech: string;
+  caseStudy: string;
   demo: string;
   github: string;
   download: string;
@@ -22,6 +23,7 @@ export const emptyProjectFormValues: ProjectFormValues = {
   date: "",
   thumbnail: "",
   tech: "",
+  caseStudy: "",
   demo: "",
   github: "",
   download: "",
@@ -135,6 +137,17 @@ export default function ProjectFormModal({
               value={values.thumbnail}
               onChange={(e) => set("thumbnail", e.target.value)}
               placeholder="https://…/thumb.png 또는 .gif·mp4 (비우면 자동 플레이스홀더)"
+            />
+          </label>
+
+          <label className="flex flex-col gap-1 text-xs font-bold text-ink-soft">
+            케이스 스터디 링크
+            <input
+              className={inputCls}
+              type="text"
+              value={values.caseStudy}
+              onChange={(e) => set("caseStudy", e.target.value)}
+              placeholder="/case-studies/…"
             />
           </label>
 

@@ -30,6 +30,7 @@ export default function AddProjectCard({ onAdded }: { onAdded: () => void }) {
         .split(",")
         .map((t) => t.trim())
         .filter(Boolean),
+      caseStudy: values.caseStudy,
       demo: values.demo,
       github: values.github,
       download: values.download,
