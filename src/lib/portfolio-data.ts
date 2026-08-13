@@ -577,7 +577,7 @@ export type ExperienceItem = {
 /** About 섹션 — 경험 타임라인. 실제 경력에 맞게 수정하세요. */
 export const experiences: ExperienceItem[] = [
   {
-    period: "2026.06 – 2026.07",
+    period: "2026.06.19 – 2026.07.02",
     title: {
       ko: "프로젝트 기반 UXUI 디자인 실전 캠프 5기",
       en: "Project-based UX/UI Design Bootcamp (5th)",
@@ -590,20 +590,20 @@ export const experiences: ExperienceItem[] = [
     },
   },
   {
-    period: "2026",
+    period: "2026.07.03 – 2026.07.30",
     title: {
       ko: "Group Act 팀 프로젝트",
       en: "Group Act Team Project",
       ja: "Group Act チームプロジェクト",
     },
     detail: {
-      ko: "케이스 스터디 준비 중",
-      en: "Case study in progress",
-      ja: "ケーススタディ準備中",
+      ko: "AI 기반 경제 뉴스 학습 서비스 'Papertory' 팀 프로젝트",
+      en: "Team project — AI-powered economic news learning service 'Papertory'",
+      ja: "AIベース経済ニュース学習サービス「Papertory」チームプロジェクト",
     },
   },
   {
-    period: "2026 –",
+    period: "2026.07 –",
     title: {
       ko: "개인 프로젝트 — 뉴스 쉬운말 모드",
       en: "Personal Project — News Easy-Read Mode",
