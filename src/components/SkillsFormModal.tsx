@@ -81,6 +81,15 @@ export default function SkillsFormModal({
         </div>
 
         <form onSubmit={handleSubmit} className="mt-4 flex flex-col gap-3">
+          {items.length > 0 && (
+            <div className="flex items-center gap-2 px-0.5 text-[11px] font-bold text-ink-faint">
+              <span className="w-4 shrink-0" />
+              <span className="flex-1">스킬 이름</span>
+              <span className="w-20 shrink-0">숙련도</span>
+              <span className="w-4 shrink-0" />
+              <span className="w-6 shrink-0" />
+            </div>
+          )}
           {items.map((item, i) => (
             <div key={i} className="flex items-center gap-2">
               <div className="flex flex-col gap-0.5">
