@@ -16,6 +16,16 @@ function sortByDateDesc(projects: Project[]): Project[] {
   });
 }
 
+/** 기본순: 가장 오래된 카드부터 나열. 날짜 없는 카드는 뒤로 보냄 */
+function sortByDateAsc(projects: Project[]): Project[] {
+  return [...projects].sort((a, b) => {
+    if (!a.date && !b.date) return 0;
+    if (!a.date) return 1;
+    if (!b.date) return -1;
+    return a.date.localeCompare(b.date);
+  });
+}
+
 export function Projects() {
   const { lang } = useLang();
 
@@ -56,7 +66,7 @@ export function SideProjects() {
   }, []);
 
   const displayedProjects = useMemo(
-    () => (sortByDate ? sortByDateDesc(sideProjects) : sideProjects),
+    () => (sortByDate ? sortByDateDesc(sideProjects) : sortByDateAsc(sideProjects)),
     [sideProjects, sortByDate]
   );
 
