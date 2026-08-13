@@ -87,7 +87,9 @@ export default function About() {
                   </span>
                   <div>
                     <p className="font-bold">{pick(exp.title, lang)}</p>
-                    <p className="mt-0.5 text-sm text-ink-soft">{pick(exp.detail, lang)}</p>
+                    {exp.detail && (
+                      <p className="mt-0.5 text-sm text-ink-soft">{pick(exp.detail, lang)}</p>
+                    )}
                   </div>
                 </li>
               ))}

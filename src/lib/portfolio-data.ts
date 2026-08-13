@@ -571,11 +571,27 @@ export async function updateSkills(
 export type ExperienceItem = {
   period: string;
   title: LocalizedText;
-  detail: LocalizedText;
+  detail?: LocalizedText;
 };
 
 /** About 섹션 — 경험 타임라인. 실제 경력에 맞게 수정하세요. */
 export const experiences: ExperienceItem[] = [
+  {
+    period: "2025.01 – 2025.12",
+    title: {
+      ko: "입시 미술학원 강사",
+      en: "Art Academy Instructor (College Entrance Prep)",
+      ja: "受験美術学院講師",
+    },
+  },
+  {
+    period: "2025.03",
+    title: {
+      ko: "서울여자대학교 졸업",
+      en: "Graduated from Seoul Women's University",
+      ja: "ソウル女子大学校卒業",
+    },
+  },
   {
     period: "2026.06.19 – 2026.07.02",
     title: {
