@@ -56,7 +56,7 @@ export const dict = {
       en: "Main projects built together with a team.",
       ja: "チームで一緒に作ったメインプロジェクトです。",
     },
-    caseStudy: { ko: "케이스 스터디", en: "Case Study", ja: "ケーススタディ" },
+    caseStudy: { ko: "상세 보기", en: "View Details", ja: "詳細を見る" },
     demo: { ko: "라이브 데모", en: "Live Demo", ja: "ライブデモ" },
     github: { ko: "GitHub", en: "GitHub", ja: "GitHub" },
     download: { ko: "파일 다운로드", en: "Download File", ja: "ファイルダウンロード" },
