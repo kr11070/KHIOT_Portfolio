@@ -56,7 +56,12 @@ export default function ProjectCard({
 
   const links = [
     { href: project.links.caseStudy, label: pick(dict.projects.caseStudy, lang), external: false, download: false },
-    { href: project.links.demo, label: pick(dict.projects.demo, lang), external: true, download: false },
+    {
+      href: project.links.demo,
+      label: project.links.demoLabel ? pick(project.links.demoLabel, lang) : pick(dict.projects.demo, lang),
+      external: true,
+      download: false,
+    },
     { href: project.links.github, label: pick(dict.projects.github, lang), external: true, download: false },
     {
       href: project.links.download,

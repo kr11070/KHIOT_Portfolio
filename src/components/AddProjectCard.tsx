@@ -32,6 +32,7 @@ export default function AddProjectCard({ onAdded }: { onAdded: () => void }) {
         .filter(Boolean),
       caseStudy: values.caseStudy,
       demo: values.demo,
+      demoLabel: values.demoLabel,
       github: values.github,
       download: values.download,
     });

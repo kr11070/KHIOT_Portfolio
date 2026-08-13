@@ -31,6 +31,7 @@ export default function EditProjectButton({
     tech: project.tech.join(", "),
     caseStudy: project.links.caseStudy ?? "",
     demo: project.links.demo ?? "",
+    demoLabel: project.links.demoLabel ? pick(project.links.demoLabel, lang) : "",
     github: project.links.github ?? "",
     download: project.links.download ?? "",
   };
@@ -52,6 +53,7 @@ export default function EditProjectButton({
         .filter(Boolean),
       caseStudy: values.caseStudy,
       demo: values.demo,
+      demoLabel: values.demoLabel,
       github: values.github,
       download: values.download,
     });

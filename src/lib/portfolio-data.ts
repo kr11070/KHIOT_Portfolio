@@ -16,6 +16,8 @@ export type Project = {
   links: {
     caseStudy?: string;
     demo?: string;
+    /** 데모 칩에 표시할 라벨. 비우면 "라이브 데모"가 기본값 (예: 리포트/대시보드형 결과물엔 "리포트 보기" 등으로 지정). */
+    demoLabel?: LocalizedText;
     github?: string;
     /** 클릭 시 새 탭 대신 파일 다운로드를 트리거합니다 (예: 디자인 시스템 md 문서). */
     download?: string;
@@ -34,6 +36,7 @@ type SideProjectDoc = {
   links: {
     caseStudy?: string | null;
     demo?: string | null;
+    demoLabel?: LocalizedText | null;
     github?: string | null;
     download?: string | null;
     download2?: string | null;
@@ -68,6 +71,7 @@ export async function getSideProjects(): Promise<Project[]> {
         links: {
           caseStudy: fromNullable(data.links.caseStudy),
           demo: fromNullable(data.links.demo),
+          demoLabel: fromNullable(data.links.demoLabel),
           github: fromNullable(data.links.github),
           download: fromNullable(data.links.download),
           download2: fromNullable(data.links.download2),
@@ -87,6 +91,8 @@ export type NewSideProject = {
   tech: string[];
   caseStudy?: string;
   demo?: string;
+  /** 데모 칩 라벨 (예: "리포트 보기"). 비우면 "라이브 데모" 기본값. */
+  demoLabel?: string;
   github?: string;
   download?: string;
 };
@@ -95,6 +101,12 @@ export type NewSideProject = {
 function orNull(v?: string) {
   const trimmed = v?.trim();
   return trimmed ? trimmed : null;
+}
+
+/** demoLabel 입력값을 3개 언어에 동일하게 채운 LocalizedText로 변환 (비우면 null) */
+function orNullLocalized(v?: string): LocalizedText | null {
+  const trimmed = v?.trim();
+  return trimmed ? { ko: trimmed, en: trimmed, ja: trimmed } : null;
 }
 
 /**
@@ -126,6 +138,7 @@ export async function addSideProject(
       links: {
         caseStudy: orNull(input.caseStudy),
         demo: orNull(input.demo),
+        demoLabel: orNullLocalized(input.demoLabel),
         github: orNull(input.github),
         download: orNull(input.download),
       },
@@ -157,6 +170,7 @@ export async function updateSideProject(
       thumbnail: orNull(input.thumbnail),
       "links.caseStudy": orNull(input.caseStudy),
       "links.demo": orNull(input.demo),
+      "links.demoLabel": orNullLocalized(input.demoLabel),
       "links.github": orNull(input.github),
       "links.download": orNull(input.download),
     });
@@ -271,6 +285,7 @@ export const fallbackSideProjects: Project[] = [
     thumbnail: "https://ik.imagekit.io/dvkhncfzk/portfolio/fashionapp.webm",
     links: {
       demo: "https://claude.ai/public/artifacts/72008362-d10e-471e-92b3-80b040bba396",
+      demoLabel: { ko: "리포트 보기", en: "View Report", ja: "レポートを見る" },
     },
   },
   {
@@ -290,6 +305,7 @@ export const fallbackSideProjects: Project[] = [
     thumbnail: "https://ik.imagekit.io/dvkhncfzk/juheeproj/%EC%A4%91%EA%B3%A0%EA%B1%B0%EB%9E%98",
     links: {
       demo: "https://marketinsight.ai.studio",
+      demoLabel: { ko: "대시보드 보기", en: "View Dashboard", ja: "ダッシュボードを見る" },
     },
   },
   {
@@ -309,6 +325,7 @@ export const fallbackSideProjects: Project[] = [
     thumbnail: "https://ik.imagekit.io/dvkhncfzk/juheeproj/pet.webm",
     links: {
       demo: "https://claude.ai/public/artifacts/395ba06b-8a10-47ac-8668-3e75cf6ddc56",
+      demoLabel: { ko: "사업계획서 보기", en: "View Business Plan", ja: "事業計画書を見る" },
     },
   },
   {
@@ -328,6 +345,7 @@ export const fallbackSideProjects: Project[] = [
     thumbnail: "https://ik.imagekit.io/dvkhncfzk/juheeproj/%EB%94%94%EC%9E%90%EC%9D%B8%EC%8B%9C%EC%8A%A4%ED%85%9C",
     links: {
       demo: "https://claude.ai/public/artifacts/9f673cf7-a6ab-4807-879e-fbe8172ab2ef",
+      demoLabel: { ko: "결과물 보기", en: "View Result", ja: "成果物を見る" },
       download: "/design-system/kissa-design-system.md",
     },
   },
@@ -348,6 +366,7 @@ export const fallbackSideProjects: Project[] = [
     thumbnail: "https://ik.imagekit.io/dvkhncfzk/juheeproj/%EC%9C%A0%EB%A0%88%EC%B9%B4",
     links: {
       demo: "https://claude.ai/public/artifacts/90dcb3f4-fc02-4c29-aae4-b600d5e95d1c",
+      demoLabel: { ko: "리포트 보기", en: "View Report", ja: "レポートを見る" },
     },
   },
   {
@@ -427,6 +446,7 @@ export const fallbackSideProjects: Project[] = [
     thumbnail: "https://ik.imagekit.io/dvkhncfzk/juheeproj/%EC%97%90%EC%96%B4%EB%B9%84%EC%95%A4%EB%B9%84",
     links: {
       demo: "https://product-insight-dashboard-223453858568.us-west1.run.app",
+      demoLabel: { ko: "대시보드 보기", en: "View Dashboard", ja: "ダッシュボードを見る" },
     },
   },
   {
@@ -446,6 +466,7 @@ export const fallbackSideProjects: Project[] = [
     thumbnail: "https://ik.imagekit.io/dvkhncfzk/juheeproj/%ED%83%80%EC%9D%B4%ED%83%80%EB%8B%89",
     links: {
       demo: "https://titanic-survivors-dashboard-223453858568.us-west1.run.app",
+      demoLabel: { ko: "대시보드 보기", en: "View Dashboard", ja: "ダッシュボードを見る" },
     },
   },
   {
