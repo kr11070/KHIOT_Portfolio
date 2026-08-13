@@ -481,6 +481,7 @@ export const fallbackSideProjects: Project[] = [
     thumbnail: "/images/hankyung-eureka-design-system/after.png",
     links: {
       caseStudy: "/case-studies/hankyung-eureka-design-system",
+      demo: "https://www.figma.com/make/XvEPWR7pDEviS3HvNXr2YR/%EA%B8%B0%EC%97%85-%EC%84%A4%EB%AA%85-%EB%B0%8F-%EC%A3%BC%EC%8B%9D%EC%B0%A8%ED%8A%B8?t=suwfkd6t4s4C2bhJ-1",
     },
   },
 ];
