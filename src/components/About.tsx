@@ -5,14 +5,28 @@ import { dict, pick, useLang } from "@/lib/i18n";
 import { experiences, fallbackSkills, getSkills, type Skill } from "@/lib/portfolio-data";
 import Reveal from "./Reveal";
 
+/** 스킬 데이터 로딩 중 보여줄 자리 표시자. 실제 목록과 뒤바뀌는 느낌을 없애기 위해 fallback을 바로 그리지 않습니다. */
+function SkillsSkeleton() {
+  return (
+    <div className="mt-6 grid grid-cols-1 gap-x-10 gap-y-5 sm:grid-cols-2">
+      {Array.from({ length: 8 }).map((_, i) => (
+        <div key={i} className="flex animate-pulse items-center gap-4">
+          <span className="h-4 w-32 shrink-0 rounded bg-line sm:w-36" />
+          <span className="h-2 flex-1 rounded-full bg-line" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function About() {
   const { lang } = useLang();
-  const [skills, setSkills] = useState<Skill[]>(fallbackSkills);
+  const [skills, setSkills] = useState<Skill[] | null>(null);
 
   useEffect(() => {
     let cancelled = false;
     getSkills().then((s) => {
-      if (!cancelled) setSkills(s);
+      if (!cancelled) setSkills(s.length > 0 ? s : fallbackSkills);
     });
     return () => {
       cancelled = true;
@@ -52,25 +66,29 @@ export default function About() {
             <h3 className="text-sm font-bold uppercase tracking-widest text-accent-deep">
               {pick(dict.about.skillsTitle, lang)}
             </h3>
-            <div className="mt-6 grid grid-cols-1 gap-x-10 gap-y-5 sm:grid-cols-2">
-              {skills.map((skill) => (
-                <div key={skill.name} className="flex items-center gap-4">
-                  <span className="w-32 shrink-0 text-sm font-semibold text-ink-soft sm:w-36">
-                    {skill.name}
-                  </span>
-                  <div className="relative h-2 flex-1 rounded-full bg-accent-soft">
-                    <div
-                      className="h-2 rounded-full bg-accent-dark"
-                      style={{ width: `${skill.level}%` }}
-                    />
-                    <span
-                      className="absolute top-1/2 h-3 w-3 -translate-y-1/2 rounded-full bg-accent-deep shadow"
-                      style={{ left: `calc(${skill.level}% - 6px)` }}
-                    />
+            {skills === null ? (
+              <SkillsSkeleton />
+            ) : (
+              <div className="mt-6 grid grid-cols-1 gap-x-10 gap-y-5 sm:grid-cols-2">
+                {skills.map((skill) => (
+                  <div key={skill.name} className="flex items-center gap-4">
+                    <span className="w-32 shrink-0 text-sm font-semibold text-ink-soft sm:w-36">
+                      {skill.name}
+                    </span>
+                    <div className="relative h-2 flex-1 rounded-full bg-accent-soft">
+                      <div
+                        className="h-2 rounded-full bg-accent-dark"
+                        style={{ width: `${skill.level}%` }}
+                      />
+                      <span
+                        className="absolute top-1/2 h-3 w-3 -translate-y-1/2 rounded-full bg-accent-deep shadow"
+                        style={{ left: `calc(${skill.level}% - 6px)` }}
+                      />
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         </Reveal>
 
