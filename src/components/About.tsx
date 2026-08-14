@@ -2,8 +2,23 @@
 
 import { useEffect, useState } from "react";
 import { dict, pick, useLang } from "@/lib/i18n";
-import { experiences, fallbackSkills, getSkills, type Skill } from "@/lib/portfolio-data";
+import {
+  experiences,
+  fallbackSkills,
+  getSkills,
+  meProfileImage,
+  type Skill,
+} from "@/lib/portfolio-data";
 import Reveal from "./Reveal";
+
+/** 사진이 없을 때 대신 보여주는 자리 표시자 */
+function ImagePlaceholder({ label }: { label: string }) {
+  return (
+    <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-accent-soft via-cream-deep to-accent/40">
+      <span className="select-none font-serif text-3xl italic text-accent-deep/70">{label}</span>
+    </div>
+  );
+}
 
 /** 스킬 데이터 로딩 중 보여줄 자리 표시자. 실제 목록과 뒤바뀌는 느낌을 없애기 위해 fallback을 바로 그리지 않습니다. */
 function SkillsSkeleton() {
@@ -42,25 +57,41 @@ export default function About() {
         <p className="mt-3 text-ink-soft">{pick(dict.about.subtitle, lang)}</p>
       </Reveal>
 
-      {/* 벤토 그리드: 소개(넓게) / 한 줄 철학 / 스킬 / 경험(넓게) */}
-      <div className="mt-10 grid gap-4 md:grid-cols-3">
-        <Reveal className="md:col-span-2" delay={100}>
-          <div className="h-full rounded-2.5xl border border-line bg-white/70 p-7 shadow-card transition-shadow hover:shadow-card-hover">
-            <h3 className="text-sm font-bold uppercase tracking-widest text-accent-deep">
-              {pick(dict.about.introTitle, lang)}
-            </h3>
-            <p className="mt-4 leading-relaxed text-ink-soft">{pick(dict.about.introBody, lang)}</p>
+      {/* 저는 주희입니다 — 카드(둥근 모서리·그림자) 없이 배경색만으로 구분. 배경만 화면 끝까지 풀블리드,
+          콘텐츠 박스는 섹션과 같은 max-w-5xl 기준이라 스킬/경험 카드와 폭이 정확히 일치합니다. */}
+      <Reveal delay={100}>
+        <div className="relative mt-10">
+          <div className="absolute inset-y-0 left-1/2 -z-10 w-screen -translate-x-1/2 bg-accent-soft" />
+          <div className="grid gap-8 py-12 md:grid-cols-2 md:py-16">
+            <div className="h-64 overflow-hidden rounded-2.5xl md:h-full">
+              {meProfileImage ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={meProfileImage} alt="이주희" className="h-full w-full object-cover" />
+              ) : (
+                <ImagePlaceholder label="주희" />
+              )}
+            </div>
+            <div className="flex flex-col justify-center">
+              <h2 className="text-3xl font-extrabold tracking-tight md:text-4xl">
+                {pick(dict.me.title, lang)}
+              </h2>
+              <h3 className="mt-6 text-sm font-bold uppercase tracking-widest text-accent-deep">
+                {pick(dict.me.roleTitle, lang)}
+              </h3>
+              <div className="mt-3 space-y-4 leading-relaxed text-ink-soft">
+                {pick(dict.me.body, lang)
+                  .split("\n\n")
+                  .map((paragraph, i) => (
+                    <p key={i}>{paragraph}</p>
+                  ))}
+              </div>
+            </div>
           </div>
-        </Reveal>
+        </div>
+      </Reveal>
 
-        <Reveal delay={200}>
-          <div className="flex h-full items-center rounded-2.5xl bg-accent-soft p-7 shadow-card transition-shadow hover:shadow-card-hover">
-            <p className="font-serif text-lg italic leading-relaxed text-accent-deep">
-              {pick(dict.about.quote, lang)}
-            </p>
-          </div>
-        </Reveal>
-
+      {/* 벤토 그리드: 스킬 / 경험(넓게) */}
+      <div className="mt-4 grid gap-4 md:grid-cols-3">
         <Reveal className="md:col-span-3" delay={150}>
           <div className="rounded-2.5xl border border-line bg-white/70 p-7 shadow-card transition-shadow hover:shadow-card-hover">
             <h3 className="text-sm font-bold uppercase tracking-widest text-accent-deep">

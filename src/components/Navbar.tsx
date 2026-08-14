@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { dict, pick, useLang } from "@/lib/i18n";
-import { resumeUrl } from "@/lib/portfolio-data";
+import { contactLinks } from "@/lib/portfolio-data";
 
 const NAV_ITEMS = [
   { href: "#about", key: "about" },
@@ -36,13 +36,12 @@ export default function Navbar() {
         </div>
 
         <div className="flex items-center gap-3">
-          {/* 이력서 다운로드 */}
+          {/* 이메일 보내기 */}
           <a
-            href={resumeUrl}
-            download
+            href={`mailto:${contactLinks.email}`}
             className="hidden rounded-full bg-accent px-4 py-2 text-sm font-bold text-ink transition-all hover:bg-accent-dark md:inline-block"
           >
-            {pick(dict.nav.resume, lang)}
+            {pick(dict.contact.emailBtn, lang)}
           </a>
 
           {/* 모바일 햄버거 */}
@@ -76,11 +75,10 @@ export default function Navbar() {
             </a>
           ))}
           <a
-            href={resumeUrl}
-            download
+            href={`mailto:${contactLinks.email}`}
             className="mt-2 inline-block rounded-full bg-accent px-4 py-2 text-sm font-bold text-ink"
           >
-            {pick(dict.nav.resume, lang)}
+            {pick(dict.contact.emailBtn, lang)}
           </a>
         </div>
       )}
