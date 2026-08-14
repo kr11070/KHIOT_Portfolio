@@ -640,6 +640,60 @@ export const experiences: ExperienceItem[] = [
   },
 ];
 
+/** "저는 주희입니다" 소개 카드에 쓰는 프로필 사진. public/ 기준 경로. 파일이 없으면 자리 표시자가 대신 나옵니다. */
+export const meProfileImage: string | undefined = "/images/me/profile.webp";
+
+export type InspirationItem = {
+  slug: string;
+  title: string;
+  blurb: LocalizedText;
+  linkLabel: LocalizedText;
+  href?: string;
+  /** public/ 기준 경로. 없으면 자리 표시자가 대신 나옵니다. */
+  image?: string;
+};
+
+/** About 아래 "Inspiration" 섹션 — 프로젝트 밖에서 눈여겨본 것들. */
+export const inspirations: InspirationItem[] = [
+  {
+    slug: "supernova-wim",
+    title: "Supernova_WIM",
+    blurb: {
+      ko: "밴드 활동을 하는 친구들의 앨범 아트를 보면서, 소리와 이미지가 만나 하나의 세계관을 이루는 방식에 자주 영감을 받습니다.",
+      en: "Watching friends' band artwork, I keep getting inspired by how sound and image come together to build a single world.",
+      ja: "バンド活動をする友人たちのアルバムアートを見ながら、音とイメージが出会って一つの世界観を作る様子によく刺激を受けます。",
+    },
+    linkLabel: { ko: "노래 들어보러 가기", en: "Listen to the song", ja: "曲を聴きに行く" },
+    image: "/images/inspiration/supernova-wim.webp",
+  },
+  {
+    slug: "gosu-hongeo",
+    title: "고수를 듬뿍 얹은 홍어",
+    blurb: {
+      ko: "세상에 고수와 홍어가 동시에 들어간 음식이 없다는 건 정말 다행입니다. 둘 다 입도 못 대는 저로서는 상상만 해도 정신이 아득해지거든요. 제법 상상력이 풍부한 편이라, 굳이 AI가 그림을 그려주지 않아도 머릿속에서 비주얼과 냄새까지 완벽하게 구현됩니다. 가끔은 이런 쓸데없이 뛰어난 상상력이 불편할 지경입니다. 하지만 새로운 걸 두려워하지 않는 태도는 디자인에서도 똑같이 필요하다고 생각합니다.",
+      en: "I'm genuinely relieved that no dish combines coriander and skate at the same time. I can't stomach either one, so just imagining it is enough to make my head spin. I have a fairly vivid imagination — I don't even need AI to draw it for me, my head conjures up the visual and the smell in perfect detail on its own. Sometimes this uselessly vivid imagination gets a little too much. Still, I think that same willingness to face the unfamiliar without fear matters just as much in design.",
+      ja: "世の中にパクチーとホンオが同時に入った料理がないのは本当に幸いです。どちらも一口も食べられない私にとっては、想像するだけで気が遠くなるからです。私はかなり想像力が豊かな方で、AIに絵を描いてもらわなくても頭の中でビジュアルと匂いまで完璧に再現されます。時々このどうでもいいほど優れた想像力が不便に感じるほどです。でも、新しいものを恐れない態度はデザインでも同じように必要だと思います。",
+    },
+    linkLabel: { ko: "고수 VS 홍어", en: "Coriander vs. Skate", ja: "パクチー vs ホンオ" },
+    image: "/images/inspiration/gosu-kongi.webp",
+  },
+  {
+    slug: "spinosaurus-aegyptiacus",
+    title: "스피노사우루스 아이깁티아쿠스",
+    blurb: {
+      ko: "“스피노사우루스 아이깁티아쿠스는 내가 이러길 원하지 않을거야” 공룡적 사고라고 하죠. 스피노사우루스는 제게 동기를 부여하고 이 친구의 걱정이 저를 초라하지 않게 만듭니다. 가끔 속상한 일이 있을 때 큰 도움이 됩니다.",
+      en: "\"Spinosaurus aegyptiacus wouldn't want me to be like this\" — that's what I call dinosaur-brained thinking. Spinosaurus motivates me, and worrying about disappointing this guy keeps me from feeling small. It genuinely helps on the days something's gotten me down.",
+      ja: "「スピノサウルス・アイギュプティアクスは私にこうあってほしくないはず」——恐竜的思考と呼んでいます。スピノサウルスは私に動機を与えてくれて、この子を心配させないようにすることが自分を惨めにさせません。時々つらいことがあったとき、大きな助けになります。",
+    },
+    linkLabel: {
+      ko: "공룡적 사고가 궁금하시다면",
+      en: "Curious about dinosaur-brained thinking?",
+      ja: "恐竜的思考が気になる方は",
+    },
+    image: "/images/inspiration/spinosaurus.webp",
+  },
+];
+
 /** 연락처/소셜 링크 — 실제 주소가 정해지면 여기만 바꾸면 됩니다. null이면 화면에 표시되지 않습니다. */
 export const contactLinks = {
   email: "leejuhee010340@gmail.com",
