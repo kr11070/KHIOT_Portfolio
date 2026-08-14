@@ -696,6 +696,7 @@ export const inspirations: InspirationItem[] = [
       ja: "世の中にパクチーとホンオが同時に入った料理がないのは本当に幸いです。どちらも一口も食べられない私にとっては、想像するだけで気が遠くなるからです。私はかなり想像力が豊かな方で、AIに絵を描いてもらわなくても頭の中でビジュアルと匂いまで完璧に再現されます。時々このどうでもいいほど優れた想像力が不便に感じるほどです。でも、新しいものを恐れない態度はデザインでも同じように必要だと思います。",
     },
     linkLabel: { ko: "고수 VS 홍어", en: "Coriander vs. Skate", ja: "パクチー vs ホンオ" },
+    href: "/inspiration/gosu-hongeo",
     image: "/images/inspiration/gosu-kongi.webp",
   },
   {
