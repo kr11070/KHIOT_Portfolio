@@ -127,11 +127,6 @@ function MilestoneRow({ item, lang }: { item: ParsedSource; lang: Lang }) {
     <li className="flex flex-wrap items-baseline gap-x-2 text-sm">
       <span className="font-semibold text-ink-faint">{item.source.period}</span>
       {content}
-      {item.source.href && (
-        <span className="rounded-full bg-accent-soft px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-accent-deep">
-          {pick(dict.about.caseStudyTag, lang)}
-        </span>
-      )}
     </li>
   );
 }
@@ -142,24 +137,24 @@ function RangeRow({ entry, lang }: { entry: RangeEntry; lang: Lang }) {
   return (
     <div>
       <div className="flex flex-col gap-1 sm:flex-row sm:gap-6">
-        <span className="w-36 shrink-0 text-sm font-semibold text-ink-faint">{source.period}</span>
+        <span className="w-28 shrink-0 text-sm font-semibold text-ink-faint">{source.period}</span>
         <div>
           <p className="font-bold">{pick(source.title, lang)}</p>
           {source.detail && <p className="mt-0.5 text-sm text-ink-soft">{pick(source.detail, lang)}</p>}
         </div>
       </div>
       {entry.milestones.length > 0 && (
-        <ul className="mt-3 space-y-1.5 border-l border-dashed border-accent-soft pl-4 sm:ml-[9.5rem]">
+        <ul className="mt-3 space-y-1.5 border-l border-dashed border-accent-soft pl-4 sm:ml-[8.5rem]">
           {entry.milestones.map((m, mi) => (
             <MilestoneRow key={mi} item={m} lang={lang} />
           ))}
         </ul>
       )}
       {source.subProjects && source.subProjects.length > 0 && (
-        <ol className="mt-3 space-y-3 border-l border-accent-soft pl-4 sm:ml-[9.5rem]">
+        <ol className="mt-3 space-y-3 border-l border-accent-soft pl-4 sm:ml-[8.5rem]">
           {source.subProjects.map((sp, spi) => (
             <li key={spi} className="flex flex-col gap-0.5 sm:flex-row sm:gap-4">
-              <span className="w-32 shrink-0 text-xs font-semibold text-ink-faint">{sp.period}</span>
+              <span className="w-20 shrink-0 text-xs font-semibold text-ink-faint">{sp.period}</span>
               <div>
                 <p className="text-sm font-bold text-ink-soft">{pick(sp.title, lang)}</p>
                 {sp.detail && <p className="text-xs text-ink-faint">{pick(sp.detail, lang)}</p>}
