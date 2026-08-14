@@ -37,6 +37,7 @@ export const dict = {
     },
     skillsTitle: { ko: "스킬 & 툴", en: "Skills & Tools", ja: "スキル＆ツール" },
     expTitle: { ko: "타임라인", en: "Timeline", ja: "タイムライン" },
+    caseStudyTag: { ko: "케이스 스터디", en: "Case Study", ja: "ケーススタディ" },
   },
   me: {
     title: { ko: "저는 주희입니다.", en: "I'm Juhee.", ja: "私はジュヒです。" },

@@ -579,6 +579,8 @@ export type ExperienceItem = {
   period: string;
   title: LocalizedText;
   detail?: LocalizedText;
+  /** 이 경험(캠프 등) 안에서 진행한 하위 팀 프로젝트들 */
+  subProjects?: { period: string; title: LocalizedText; detail?: LocalizedText }[];
 };
 
 /** About 섹션 — 경험 타임라인. 실제 경력에 맞게 수정하세요. */
@@ -600,37 +602,55 @@ export const experiences: ExperienceItem[] = [
     },
   },
   {
-    period: "2026.06.19 – 2026.07.02",
+    period: "2025.05 – 2026.06",
+    title: {
+      ko: "머더 미스터리 보드게임 제작 프로젝트",
+      en: "Murder Mystery Board Game Development Project",
+      ja: "マーダーミステリー ボードゲーム制作プロジェクト",
+    },
+  },
+  {
+    period: "2026.04.13 – 2026.08.10",
     title: {
       ko: "프로젝트 기반 UXUI 디자인 실전 캠프 5기",
       en: "Project-based UX/UI Design Bootcamp (5th)",
       ja: "プロジェクト型UX/UIデザイン実践キャンプ 5期",
     },
-    detail: {
-      ko: "Agile Squad 팀 — UX 리서치, 프로토타이핑, 스크럼 회의록",
-      en: "Team Agile Squad — UX research, prototyping, scrum documentation",
-      ja: "Agile Squadチーム — UXリサーチ、プロトタイピング、スクラム議事録",
-    },
-  },
-  {
-    period: "2026.07.03 – 2026.07.30",
-    title: {
-      ko: "Group Act 팀 프로젝트",
-      en: "Group Act Team Project",
-      ja: "Group Act チームプロジェクト",
-    },
-    detail: {
-      ko: "AI 기반 경제 뉴스 학습 서비스 'Papertory' 팀 프로젝트",
-      en: "Team project — AI-powered economic news learning service 'Papertory'",
-      ja: "AIベース経済ニュース学習サービス「Papertory」チームプロジェクト",
-    },
+    subProjects: [
+      {
+        period: "2026.06.19 – 2026.07.02",
+        title: {
+          ko: "Agile Squad 팀 프로젝트",
+          en: "Agile Squad Team Project",
+          ja: "Agile Squad チームプロジェクト",
+        },
+        detail: {
+          ko: "UX 리서치, 프로토타이핑, 스크럼 회의록",
+          en: "UX research, prototyping, scrum documentation",
+          ja: "UXリサーチ、プロトタイピング、スクラム議事録",
+        },
+      },
+      {
+        period: "2026.07.03 – 2026.07.30",
+        title: {
+          ko: "Group Act 팀 프로젝트",
+          en: "Group Act Team Project",
+          ja: "Group Act チームプロジェクト",
+        },
+        detail: {
+          ko: "AI 기반 경제 뉴스 학습 서비스 'Papertory' 팀 프로젝트",
+          en: "Team project — AI-powered economic news learning service 'Papertory'",
+          ja: "AIベース経済ニュース学習サービス「Papertory」チームプロジェクト",
+        },
+      },
+    ],
   },
   {
     period: "2026.07 –",
     title: {
-      ko: "개인 프로젝트 — 뉴스 쉬운말 모드",
-      en: "Personal Project — News Easy-Read Mode",
-      ja: "個人プロジェクト — ニュースやさしい言葉モード",
+      ko: "뉴스 쉬운말 모드",
+      en: "News Easy-Read Mode",
+      ja: "ニュースやさしい言葉モード",
     },
     detail: {
       ko: "Chrome 확장 기획·디자인·개발, 웹스토어 공개 준비",
@@ -664,6 +684,7 @@ export const inspirations: InspirationItem[] = [
       ja: "バンド活動をする友人たちのアルバムアートを見ながら、音とイメージが出会って一つの世界観を作る様子によく刺激を受けます。",
     },
     linkLabel: { ko: "노래 들어보러 가기", en: "Listen to the song", ja: "曲を聴きに行く" },
+    href: "/inspiration/supernova-wim",
     image: "/images/inspiration/supernova-wim.webp",
   },
   {
@@ -690,6 +711,7 @@ export const inspirations: InspirationItem[] = [
       en: "Curious about dinosaur-brained thinking?",
       ja: "恐竜的思考が気になる方は",
     },
+    href: "/inspiration/spinosaurus-aegyptiacus",
     image: "/images/inspiration/spinosaurus.webp",
   },
 ];

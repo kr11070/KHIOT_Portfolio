@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { dict, pick, useLang } from "@/lib/i18n";
 import { inspirations } from "@/lib/portfolio-data";
 import Reveal from "./Reveal";
@@ -18,7 +19,7 @@ export function InspirationGallery() {
   const { lang } = useLang();
 
   return (
-    <section className="scroll-mt-20 py-24">
+    <section id="inspiration" className="scroll-mt-20 py-24">
       <div className="mx-auto max-w-5xl px-5">
         <Reveal>
           <h2 className="text-3xl font-extrabold tracking-tight md:text-4xl">
@@ -47,15 +48,25 @@ export function InspirationGallery() {
               <h3 className="mt-4 text-xl font-extrabold tracking-tight">{item.title}</h3>
               <p className="mt-2 leading-relaxed text-ink-soft">{pick(item.blurb, lang)}</p>
               {item.href ? (
-                <a
-                  href={item.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-3 inline-flex items-center gap-1 text-sm font-bold text-accent-deep hover:underline"
-                >
-                  {pick(item.linkLabel, lang)}
-                  <span aria-hidden="true">→</span>
-                </a>
+                item.href.startsWith("/") ? (
+                  <Link
+                    href={item.href}
+                    className="mt-3 inline-flex items-center gap-1 text-sm font-bold text-accent-deep hover:underline"
+                  >
+                    {pick(item.linkLabel, lang)}
+                    <span aria-hidden="true">→</span>
+                  </Link>
+                ) : (
+                  <a
+                    href={item.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-3 inline-flex items-center gap-1 text-sm font-bold text-accent-deep hover:underline"
+                  >
+                    {pick(item.linkLabel, lang)}
+                    <span aria-hidden="true">→</span>
+                  </a>
+                )
               ) : (
                 <span className="mt-3 inline-flex items-center gap-1 text-sm font-bold text-accent-deep">
                   {pick(item.linkLabel, lang)}
