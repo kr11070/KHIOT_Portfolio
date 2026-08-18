@@ -209,10 +209,7 @@ export default function About() {
               <h2 className="text-3xl font-extrabold tracking-tight md:text-4xl">
                 {pick(dict.me.title, lang)}
               </h2>
-              <h3 className="mt-6 text-sm font-bold uppercase tracking-widest text-accent-deep">
-                {pick(dict.me.roleTitle, lang)}
-              </h3>
-              <div className="mt-3 space-y-4 leading-relaxed text-ink-soft">
+              <div className="mt-6 space-y-4 leading-relaxed text-ink-soft">
                 {pick(dict.me.body, lang)
                   .split("\n\n")
                   .map((paragraph, i) => (
