@@ -40,7 +40,6 @@ export const dict = {
   },
   me: {
     title: { ko: "저는 주희입니다.", en: "I'm Juhee.", ja: "私はジュヒです。" },
-    roleTitle: { ko: "디자이너 주희는", en: "As a designer, Juhee", ja: "デザイナー、ジュヒは" },
     body: {
       ko: "사용자 인터뷰와 데이터에서 출발해 와이어프레임, 인터랙티브 프로토타입까지 만드는 UI/UX 디자이너입니다. 애자일 스크럼과 그룹 액트 팀 협업 경험이 있고, 아이디어를 실제로 동작하는 형태로 빠르게 검증합니다.\n\n디자인 밖에서 마주치는 것들, 예를 들면 좋아하는 음악이나 못 먹는 음식, 우연히 알게 된 사람들의 이야기 같은 것들도 결국은 다 관찰과 공감의 연습이라고 생각합니다.",
       en: "I'm a UI/UX designer who moves from user interviews and data to wireframes and interactive prototypes. I've worked in Agile Scrum and on the Group Act team, and I like to quickly validate ideas in a working form.\n\nThings outside of design, like music I love, foods I can't stand, or stories from people I met by chance, are all, in the end, practice in observation and empathy.",
