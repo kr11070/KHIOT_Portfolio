@@ -42,7 +42,7 @@ export function Projects() {
       <div className="mt-10 grid gap-6 md:grid-cols-2">
         {mainProjects.map((project, i) => (
           <Reveal key={project.slug} delay={i * 120}>
-            <ProjectCard project={project} />
+            <ProjectCard project={project} hideCaseStudyLink />
           </Reveal>
         ))}
       </div>

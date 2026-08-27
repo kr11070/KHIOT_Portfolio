@@ -206,14 +206,14 @@ export const mainProjects: Project[] = [
   {
     slug: "agile-squad",
     title: {
-      ko: "Agile Squad — 한경 뉴스 리딩 경험 개선",
-      en: "Agile Squad — Hankyung News Reading Experience",
-      ja: "Agile Squad — 韓経ニュース読書体験の改善",
+      ko: "한경 뉴스 리딩 경험 개선",
+      en: "Hankyung News Reading Experience",
+      ja: "韓経ニュース読書体験の改善",
     },
     description: {
-      ko: "2030 신규 사용자를 위한 경제 뉴스 앱 UX/UI. 사용자 리서치부터 읽기 난이도 슬라이더가 있는 인터랙티브 프로토타입까지 팀으로 완성했습니다.",
-      en: "Economic-news app UX/UI for young readers — from user research to an interactive prototype with a reading-level slider, built as a scrum team.",
-      ja: "20〜30代の新規ユーザー向け経済ニュースアプリのUX/UI。ユーザーリサーチから読みやすさスライダー付きプロトタイプまでチームで完成させました。",
+      ko: "2030 신규 사용자를 위한 경제 뉴스 앱 UX/UI. 사용자 리서치부터 읽기 난이도 슬라이더가 있는 인터랙티브 프로토타입까지 'Agile Squad' 팀 프로젝트로 완성했습니다.",
+      en: "Economic-news app UX/UI for young readers — from user research to an interactive prototype with a reading-level slider, built as the \"Agile Squad\" scrum team project.",
+      ja: "20〜30代の新規ユーザー向け経済ニュースアプリのUX/UI。ユーザーリサーチから読みやすさスライダー付きプロトタイプまで「Agile Squad」チームプロジェクトとして完成させました。",
     },
     tech: ["Figma", "UX Research", "Agile Scrum", "React", "Vite"],
     date: "2026.06.19 – 2026.07.02",
@@ -227,14 +227,14 @@ export const mainProjects: Project[] = [
   {
     slug: "group-act",
     title: {
-      ko: "Group Act — AI 기반 경제 뉴스 학습 경험 개선",
-      en: "Group Act — AI-Powered Economic News Learning Experience",
-      ja: "Group Act — AIベース経済ニュース学習体験の改善",
+      ko: "페이퍼토리(Papertory)",
+      en: "Papertory",
+      ja: "Papertory",
     },
     description: {
-      ko: "종이신문의 밑줄·메모 경험을 모바일로 확장한 AI 기반 경제 뉴스 학습 서비스 'Papertory'. 하이라이트 요약, 쉬운 기사 설명, 게임형 콘텐츠로 경제 뉴스 입문자의 진입장벽을 낮추는 프로토타입을 팀으로 완성했습니다.",
-      en: "\"Papertory\" — an AI-powered economic news learning service that brings the paper-newspaper habit of underlining and note-taking to mobile. Built as a team, with AI highlight summaries, simplified articles, and game-like content that lower the entry barrier for news beginners.",
-      ja: "紙の新聞で線を引きメモを取る読書体験をモバイルに拡張したAIベースの経済ニュース学習サービス「Papertory」。ハイライト要約、やさしい記事解説、ゲーム型コンテンツで経済ニュース初心者の参入障壁を下げるプロトタイプをチームで完成させました。",
+      ko: "종이신문의 밑줄·메모 경험을 모바일로 확장한 AI 기반 경제 뉴스 학습 서비스 '페이퍼토리(Papertory)'. 하이라이트 요약, 쉬운 기사 설명, 게임형 콘텐츠로 경제 뉴스 입문자의 진입장벽을 낮추는 프로토타입을 'Group Act' 팀 프로젝트로 완성했습니다.",
+      en: "\"Papertory\" — an AI-powered economic news learning service that brings the paper-newspaper habit of underlining and note-taking to mobile. Built as the \"Group Act\" team project, with AI highlight summaries, simplified articles, and game-like content that lower the entry barrier for news beginners.",
+      ja: "紙の新聞で線を引きメモを取る読書体験をモバイルに拡張したAIベースの経済ニュース学習サービス「ペーパートリー（Papertory）」。ハイライト要約、やさしい記事解説、ゲーム型コンテンツで経済ニュース初心者の参入障壁を下げるプロトタイプを「Group Act」チームプロジェクトとして完成させました。",
     },
     tech: ["UX Research", "Figma", "React", "AI"],
     date: "2026.07.03 – 2026.07.30",
