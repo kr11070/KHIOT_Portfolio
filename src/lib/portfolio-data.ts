@@ -586,7 +586,7 @@ export type ExperienceItem = {
 /** About 섹션 — 경험 타임라인. 실제 경력에 맞게 수정하세요. */
 export const experiences: ExperienceItem[] = [
   {
-    period: "2025.01 – 2025.12",
+    period: "2024.12 – 2025.12",
     title: {
       ko: "입시 미술학원 강사",
       en: "Art Academy Instructor (College Entrance Prep)",
