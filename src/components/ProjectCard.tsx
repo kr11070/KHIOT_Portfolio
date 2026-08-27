@@ -40,9 +40,12 @@ function ThumbPlaceholder({ slug, title }: { slug: string; title: string }) {
 export default function ProjectCard({
   project,
   compact = false,
+  hideCaseStudyLink = false,
 }: {
   project: Project;
   compact?: boolean;
+  /** 메인 프로젝트 카드에서는 "상세 보기" 칩을 숨깁니다. */
+  hideCaseStudyLink?: boolean;
 }) {
   const { lang } = useLang();
   const title = pick(project.title, lang);
@@ -55,7 +58,12 @@ export default function ProjectCard({
   const hasTwoDownloads = Boolean(project.links.download && project.links.download2);
 
   const links = [
-    { href: project.links.caseStudy, label: pick(dict.projects.caseStudy, lang), external: false, download: false },
+    {
+      href: hideCaseStudyLink ? undefined : project.links.caseStudy,
+      label: pick(dict.projects.caseStudy, lang),
+      external: false,
+      download: false,
+    },
     {
       href: project.links.demo,
       label: project.links.demoLabel ? pick(project.links.demoLabel, lang) : pick(dict.projects.demo, lang),
