@@ -27,7 +27,7 @@ function Thumb({
 }
 
 /** 썸네일이 없을 때 프로젝트 첫 글자로 만드는 그라데이션 플레이스홀더 */
-function ThumbPlaceholder({ slug, title }: { slug: string; title: string }) {
+function ThumbPlaceholder({ title }: { title: string }) {
   return (
     <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-accent-soft via-cream-deep to-accent/40">
       <span className="select-none font-serif text-5xl italic text-accent-deep/70">
@@ -120,7 +120,7 @@ export default function ProjectCard({
             />
           )
         ) : (
-          <ThumbPlaceholder slug={project.slug} title={title} />
+          <ThumbPlaceholder title={title} />
         )}
       </Thumb>
 

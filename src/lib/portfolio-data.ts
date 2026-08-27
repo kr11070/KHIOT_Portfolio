@@ -745,6 +745,3 @@ export const contactLinks = {
   linkedin: null as string | null,
   instagram: null as string | null,
 };
-
-/** 이력서 PDF 경로 — public/resume.pdf 자리에 파일을 넣어주세요. */
-export const resumeUrl = "/resume.pdf";
