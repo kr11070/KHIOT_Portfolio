@@ -524,6 +524,7 @@ export const fallbackSideProjects: Project[] = [
     },
     tech: ["PRD", "Market Research", "Service Design", "AI"],
     date: "2026.05.27 – 2026.06.04",
+    thumbnail: "/images/tasklit-ai-meeting-notes/thumb.png",
     links: {
       caseStudy: "/case-studies/tasklit-ai-meeting-notes",
     },
