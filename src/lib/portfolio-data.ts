@@ -511,6 +511,24 @@ export const fallbackSideProjects: Project[] = [
     },
   },
   {
+    slug: "tasklit-ai-meeting-notes",
+    title: {
+      ko: "TaskLit",
+      en: "TaskLit",
+      ja: "TaskLit",
+    },
+    description: {
+      ko: "4인 팀 프로젝트. 회의 후 쏟아지는 데이터를 Owner·Controller·Manager·Viewer 권한별로 나누어 보여주고, 종료 30분~1시간 내 AI가 요약본과 담당자별 액션 플랜을 자동 생성하는 AI 회의록 서비스 PRD입니다.",
+      en: "4인 팀 프로젝트. 회의 후 쏟아지는 데이터를 Owner·Controller·Manager·Viewer 권한별로 나누어 보여주고, 종료 30분~1시간 내 AI가 요약본과 담당자별 액션 플랜을 자동 생성하는 AI 회의록 서비스 PRD입니다.",
+      ja: "4인 팀 프로젝트. 회의 후 쏟아지는 데이터를 Owner·Controller·Manager·Viewer 권한별로 나누어 보여주고, 종료 30분~1시간 내 AI가 요약본과 담당자별 액션 플랜을 자동 생성하는 AI 회의록 서비스 PRD입니다.",
+    },
+    tech: ["PRD", "Market Research", "Service Design", "AI"],
+    date: "2026.05.27 – 2026.06.04",
+    links: {
+      caseStudy: "/case-studies/tasklit-ai-meeting-notes",
+    },
+  },
+  {
     slug: "hankyung-eureka-design-system",
     title: {
       ko: "한경 유레카 디자인 시스템",
