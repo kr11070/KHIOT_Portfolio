@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import { dict, pick, useLang, type Lang } from "@/lib/i18n";
 import {
@@ -26,7 +25,8 @@ type TimelineSource = {
 
 /** 케이스 스터디 페이지가 연결된 사이드 프로젝트만 타임라인에 노출합니다. */
 const caseStudySources: TimelineSource[] = fallbackSideProjects
-  .filter((p) => p.date && p.links.caseStudy)
+  // TaskLit은 실전 캠프 experiences 항목의 subProjects로 이미 표시되므로 여기서는 제외.
+  .filter((p) => p.date && p.links.caseStudy && p.slug !== "tasklit-ai-meeting-notes")
   .map((p) => ({ period: p.date!, title: p.title, href: p.links.caseStudy }));
 
 type ParsedSource = { source: TimelineSource; start: Date; end: Date | null; isMilestone: boolean };
@@ -116,17 +116,10 @@ function SkillsSkeleton() {
 /** 졸업 같은 경험 마일스톤과, 케이스 스터디 페이지로 연결되는 마일스톤을 함께 렌더링합니다. */
 function MilestoneRow({ item, lang }: { item: ParsedSource; lang: Lang }) {
   const title = pick(item.source.title, lang);
-  const content = item.source.href ? (
-    <Link href={item.source.href} className="text-accent-deep underline decoration-accent-soft underline-offset-2 hover:text-ink">
-      {title}
-    </Link>
-  ) : (
-    <span className="text-ink-soft">{title}</span>
-  );
   return (
     <li className="flex flex-wrap items-baseline gap-x-2 text-sm">
       <span className="font-semibold text-ink-faint">{item.source.period}</span>
-      {content}
+      <span className="text-ink-soft">{title}</span>
     </li>
   );
 }
@@ -224,7 +217,7 @@ export default function About() {
       {/* 벤토 그리드: 스킬 / 경험(넓게) */}
       <div className="mt-4 grid gap-4 md:grid-cols-3">
         <Reveal className="md:col-span-3" delay={150}>
-          <div className="rounded-2.5xl border border-line bg-white/70 p-7 shadow-card transition-shadow hover:shadow-card-hover">
+          <div className="rounded-2.5xl bg-white/70 p-7">
             <h3 className="text-sm font-bold uppercase tracking-widest text-accent-deep">
               {pick(dict.about.skillsTitle, lang)}
             </h3>
@@ -255,7 +248,7 @@ export default function About() {
         </Reveal>
 
         <Reveal className="md:col-span-3" delay={250}>
-          <div className="rounded-2.5xl border border-line bg-white/70 p-7 shadow-card transition-shadow hover:shadow-card-hover">
+          <div className="rounded-2.5xl bg-white/70 p-7">
             <h3 className="text-sm font-bold uppercase tracking-widest text-accent-deep">
               {pick(dict.about.expTitle, lang)}
             </h3>

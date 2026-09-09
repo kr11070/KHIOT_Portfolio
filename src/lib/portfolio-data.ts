@@ -652,11 +652,24 @@ export const experiences: ExperienceItem[] = [
   {
     period: "2026.04.13 – 2026.08.10",
     title: {
-      ko: "프로젝트 기반 UXUI 디자인 실전 캠프 5기",
-      en: "Project-based UX/UI Design Bootcamp (5th)",
-      ja: "プロジェクト型UX/UIデザイン実践キャンプ 5期",
+      ko: "프로젝트 기반 UXUI 디자인 실전 캠프",
+      en: "Project-based UX/UI Design Bootcamp",
+      ja: "プロジェクト型UX/UIデザイン実践キャンプ",
     },
     subProjects: [
+      {
+        period: "2026.05.27 – 2026.06.04",
+        title: {
+          ko: "TaskLit",
+          en: "TaskLit",
+          ja: "TaskLit",
+        },
+        detail: {
+          ko: "AI 회의록 서비스 PRD · 4인 팀 프로젝트",
+          en: "AI meeting notes service PRD — 4-person team project",
+          ja: "AI議事録サービスPRD・4人チームプロジェクト",
+        },
+      },
       {
         period: "2026.06.19 – 2026.07.02",
         title: {
