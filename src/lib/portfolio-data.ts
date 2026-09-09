@@ -693,9 +693,9 @@ export const experiences: ExperienceItem[] = [
       ja: "ニュースやさしい言葉モード",
     },
     detail: {
-      ko: "Chrome 확장 기획·디자인·개발, 웹스토어 공개 준비",
-      en: "Planning, design & development of a Chrome extension; preparing Web Store launch",
-      ja: "Chrome拡張の企画・デザイン・開発、ストア公開準備",
+      ko: "Chrome 확장 기획·디자인·개발",
+      en: "Planning, design & development of a Chrome extension",
+      ja: "Chrome拡張の企画・デザイン・開発",
     },
   },
 ];
@@ -719,9 +719,9 @@ export const inspirations: InspirationItem[] = [
     slug: "supernova-wim",
     title: "Supernova_WIM",
     blurb: {
-      ko: "밴드 활동을 하는 친구들의 앨범 아트를 보면서, 소리와 이미지가 만나 하나의 세계관을 이루는 방식에 자주 영감을 받습니다.",
-      en: "Watching friends' band artwork, I keep getting inspired by how sound and image come together to build a single world.",
-      ja: "バンド活動をする友人たちのアルバムアートを見ながら、音とイメージが出会って一つの世界観を作る様子によく刺激を受けます。",
+      ko: "WIM의 Supernova라는 노래를 들으면 작업 효율이 올라갑니다.",
+      en: "Listening to WIM's song Supernova boosts my work efficiency.",
+      ja: "WIMのSupernovaという曲を聴くと作業効率が上がります。",
     },
     linkLabel: { ko: "노래 들어보러 가기", en: "Listen to the song", ja: "曲を聴きに行く" },
     href: "/inspiration/supernova-wim",
