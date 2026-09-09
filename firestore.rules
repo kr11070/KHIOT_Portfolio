@@ -10,8 +10,10 @@ service cloud.firestore {
     // (한쪽 필드만, 정확히 +1 인지 규칙에서 검증해서 임의 값 조작을 막음)
     match /votes/gosu-hongeo {
       allow read: if true;
-      allow create: if request.resource.data.keys().hasOnly(['gosu', 'hongeo'])
-        && request.resource.data.gosu == 0 && request.resource.data.hongeo == 0;
+      allow create: if request.resource.data.keys().hasOnly(['gosu', 'hongeo']) && (
+        (request.resource.data.gosu == 1 && request.resource.data.hongeo == 0) ||
+        (request.resource.data.hongeo == 1 && request.resource.data.gosu == 0)
+      );
       allow update: if request.resource.data.keys().hasOnly(['gosu', 'hongeo']) && (
         (request.resource.data.gosu == resource.data.gosu + 1 && request.resource.data.hongeo == resource.data.hongeo) ||
         (request.resource.data.hongeo == resource.data.hongeo + 1 && request.resource.data.gosu == resource.data.gosu)

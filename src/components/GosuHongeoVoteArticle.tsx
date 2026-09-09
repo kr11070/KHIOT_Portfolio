@@ -33,7 +33,11 @@ async function submitVote(choice: Vote) {
   try {
     await updateDoc(ref, { [choice]: increment(1) });
   } catch {
-    await setDoc(ref, { gosu: choice === "gosu" ? 1 : 0, hongeo: choice === "hongeo" ? 1 : 0 });
+    try {
+      await setDoc(ref, { gosu: choice === "gosu" ? 1 : 0, hongeo: choice === "hongeo" ? 1 : 0 });
+    } catch {
+      // 문서가 이미 존재하는데 규칙 문제로 update가 막힌 경우 등 — 화면엔 이미 낙관적으로 반영했으니 조용히 무시.
+    }
   }
 }
 
