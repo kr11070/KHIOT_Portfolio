@@ -119,7 +119,7 @@ function MilestoneRow({ item, lang }: { item: ParsedSource; lang: Lang }) {
   return (
     <li className="flex flex-wrap items-baseline gap-x-2 text-sm">
       <span className="font-semibold text-ink-faint">{item.source.period}</span>
-      <span className="text-ink-soft">{title}</span>
+      <span className="font-bold text-ink-soft">{title}</span>
     </li>
   );
 }
