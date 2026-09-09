@@ -53,12 +53,11 @@ export function Projects() {
 /** 카드 데이터 로딩 중 보여줄 자리 표시자. fallback 카드가 실제 목록과 뒤바뀌는 느낌을 없애기 위해 씁니다. */
 function ProjectCardSkeleton() {
   return (
-    <div className="flex h-full animate-pulse flex-col">
-      <div className="h-36 rounded-2xl bg-line" />
-      <div className="mt-4 flex flex-1 flex-col">
-        <div className="h-3 w-16 rounded bg-line" />
-        <div className="mt-2 border-t border-line" />
-        <div className="mt-3 h-5 w-3/4 rounded bg-line" />
+    <div className="flex h-full animate-pulse flex-col overflow-hidden rounded-2.5xl border border-line bg-white/70 shadow-card">
+      <div className="h-36 bg-line" />
+      <div className="flex flex-1 flex-col p-4">
+        <div className="h-5 w-16 rounded-full bg-line" />
+        <div className="mt-2.5 h-5 w-3/4 rounded bg-line" />
         <div className="mt-3 flex-1 space-y-2">
           <div className="h-3 w-full rounded bg-line" />
           <div className="h-3 w-5/6 rounded bg-line" />
